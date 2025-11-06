@@ -1,0 +1,28 @@
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+extend-exclude = "migrations|.venv"
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = ["migrations", ".venv"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["migrations", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "UP"]
+ignore = ["E203", "UP007", "B008", "B904"]
+fixable = ["ALL"]
+per-file-ignores = { "*/examples/*" = ["E501"] }
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+pretty = true
+show_error_codes = true
+warn_unused_ignores = true
+exclude = "migrations|.venv"
