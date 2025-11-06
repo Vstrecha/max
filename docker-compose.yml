@@ -44,5 +44,20 @@ services:
     depends_on:
       - backend
 
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - ./admin:/app
+    working_dir: /app
+    command: ./start.sh
+
 volumes:
   postgres_data:
