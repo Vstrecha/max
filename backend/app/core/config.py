@@ -12,12 +12,14 @@ from pydantic_settings import BaseSettings
 
 # --------------------------------------------------------------------------------
 
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
+# Вычисляем корень проекта (4 уровня вверх от backend/app/core/config.py)
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-# Перебор возможных путей для .env
+# Перебор возможных путей для .env (приоритет корневому .env)
 ENV_PATHS = [
+    ROOT_DIR / ".env",  # Корневой .env имеет приоритет
     Path(".env"),
-    ROOT_DIR / ".env",
+    ROOT_DIR / "backend" / ".env",
     ROOT_DIR / "app" / ".env",
     ROOT_DIR / "app" / "api" / ".env",
     ROOT_DIR / "app" / "core" / ".env",
@@ -72,7 +74,7 @@ class Settings(BaseSettings):
     DOCS_PASSWORD: str = "<PASSWORD>"
     BASE_API_URL: str = "http://localhost:8000"
 
-    # TELEGRAM
+    # MAX
     BOT_TOKEN: str = "<TOKEN>"
 
     # S3 Configuration

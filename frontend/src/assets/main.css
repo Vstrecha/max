@@ -1,0 +1,59 @@
+@import 'normalize.css';
+
+:root {
+  --var-background-color: #1a1a1a;
+  --var-opposite-background-color: #ffffff;
+  --var-small-parts-background-color: #4d4d4d;
+  --var-primary-emph-color: #bb8cfc;
+  --var-secondary-emph-color: #c3fe4c;
+  --var-editing-color: #ffffff80;
+}
+
+html {
+  background: var(--var-background-color);
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  color: var(--var-primary-emph-color);
+
+  background: var(--var-background-color);
+  overflow: hidden;
+}
+
+:root:root {
+  --van-base-font: 'Montserrat', sans-serif;
+
+  /* edit default button */
+  --van-button-default-background: var(--var-primary-emph-color);
+  --van-button-default-color: var(--var-background-color);
+  --van-button-default-border-color: var(--var-primary-emph-color);
+
+  /* edit primary button */
+  --van-button-primary-background: var(--var-secondary-emph-color);
+  --van-button-primary-color: var(--var-background-color);
+  --van-button-primary-border-color: var(--var-secondary-emph-color);
+
+  --van-button-normal-font-size: 14px;
+  --van-button-normal-padding: 20px 32px;
+  --van-button-radius: 10px;
+
+  /* edit notify */
+  --van-notify-padding: 115px 25px 25px 25px;
+  --van-notify-primary-background: var(--var-primary-emph-color);
+  --van-notify-text-color: var(--var-background-color);
+  --van-notify-font-size: 16px;
+
+  /* edit switch */
+  --van-switch-size: 17px;
+  --van-switch-height: 21px;
+  --van-switch-width: 40px;
+  --van-switch-node-background: var(--var-opposite-background-color);
+  --van-switch-on-background: var(--var-secondary-emph-color);
+  --van-switch-background: var(--var-small-parts-background-color);
+
+  /* edit image */
+  --van-image-placeholder-background: var(--var-small-parts-background-color);
+}

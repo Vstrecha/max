@@ -45,4 +45,4 @@ generate_docs.py
 
 # Виртуальное окружение
 venv/
-.env
+../.env

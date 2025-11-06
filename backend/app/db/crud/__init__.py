@@ -5,7 +5,7 @@ Database operations for all entities.
 
 # --------------------------------------------------------------------------------
 
-from . import events, files, friends, invitations, profiles
+from . import events, files, friends, invitations, profiles, qr_scans
 
 # --------------------------------------------------------------------------------
 
@@ -15,4 +15,5 @@ __all__ = [
     "friends",
     "invitations",
     "events",
+    "qr_scans",
 ]

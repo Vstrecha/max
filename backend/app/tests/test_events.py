@@ -29,7 +29,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -47,8 +47,6 @@ class TestEventCRUD:
             "tags": ["Спорт", "Природа"],
             "start_date": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
             "end_date": (datetime.now() + timedelta(days=1, hours=2)).strftime("%Y-%m-%d"),
-            "visability": "G",
-            "repeatability": "N",
             "status": "A",
         }
 
@@ -62,11 +60,11 @@ class TestEventCRUD:
         event_data = create_event_response.json()
         assert event_data["title"] == "Test Event"
         assert event_data["creator"] == profile_id
-        assert event_data["visability"] == "G"
         assert "tags" in event_data
         assert isinstance(event_data["tags"], list)
         assert "participants" in event_data
         assert event_data["participants"] == 1  # Creator is automatically added as participant
+        assert "is_registration_available" in event_data
 
     def test_create_event_with_invalid_tags(self, client: TestClient, clean_db):
         """Test creating an event with invalid tags."""
@@ -83,7 +81,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -127,7 +125,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -174,7 +172,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -234,7 +232,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -292,7 +290,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -351,7 +349,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -416,7 +414,7 @@ class TestEventParticipation:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": creator_id,
+            "max_id": creator_id,
             "invited_by": None,
         }
         create_creator_response = client.post(
@@ -469,7 +467,7 @@ class TestEventParticipation:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": creator_id,
+            "max_id": creator_id,
             "invited_by": None,
         }
         create_creator_response = client.post(
@@ -530,7 +528,7 @@ class TestEventParticipation:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -590,7 +588,7 @@ class TestEventFiltering:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -608,8 +606,6 @@ class TestEventFiltering:
                 "tags": ["Спорт"],
                 "start_date": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
                 "end_date": (datetime.now() + timedelta(days=1, hours=2)).strftime("%Y-%m-%d"),
-                "visability": "G",
-                "repeatability": "N",
                 "status": "A",
             },
             {
@@ -618,8 +614,6 @@ class TestEventFiltering:
                 "tags": ["Природа"],
                 "start_date": (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d"),
                 "end_date": (datetime.now() + timedelta(days=2, hours=2)).strftime("%Y-%m-%d"),
-                "visability": "P",
-                "repeatability": "R",
                 "status": "A",
             },
         ]
@@ -632,16 +626,17 @@ class TestEventFiltering:
             )
             assert create_event_response.status_code == 200, create_event_response.text
 
-        # Test getting events with visibility filter
+        # Test getting events without filter (all events)
         get_events_response = client.get(
-            f"{settings.API_VERSION}/events/global_events/?visability=G",
+            f"{settings.API_VERSION}/events/global_events/",
             headers={"Authorization": f"tma {init_data}"},
         )
         assert get_events_response.status_code == 200, get_events_response.text
 
         events_data = get_events_response.json()
-        assert len(events_data["events"]) >= 1
-        assert all(event["event"]["visability"] == "G" for event in events_data["events"])
+        assert len(events_data["events"]) >= 2  # Both events should be returned
+        # Check that events have tags
+        assert all("tags" in event["event"] for event in events_data["events"])
 
     def test_get_events_with_pagination(self, client: TestClient, clean_db):
         """Test event pagination."""
@@ -658,7 +653,7 @@ class TestEventFiltering:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(

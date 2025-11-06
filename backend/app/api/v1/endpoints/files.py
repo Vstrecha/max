@@ -76,7 +76,7 @@ async def upload_file(
     Returns:
         FileUploadResponse: File information and access token.
     """
-    telegram_id = request.state.user_id
+    max_id = request.state.user_id
 
     # Read file content
     file_content = await file.read()
@@ -109,7 +109,7 @@ async def upload_file(
     from app.schemas.files import FileCreate
 
     file_create = FileCreate(name=file.filename, type=file_type)
-    db_file = crud_files.create_file(db, file_create, telegram_id, url)
+    db_file = crud_files.create_file(db, file_create, max_id, url)
 
     return FileUploadResponse(id=db_file.id, url=db_file.url)
 
@@ -138,17 +138,17 @@ async def get_my_files(
     Returns:
         List[File]: List of user's files.
     """
-    telegram_id = request.state.user_id
+    max_id = request.state.user_id
 
-    # Get user profile by telegram ID
-    profile = crud_profiles.get_profile_by_telegram(db, telegram_id)
+    # Get user profile by Max ID
+    profile = crud_profiles.get_profile_by_max_id(db, max_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
     if file_type:
-        files = crud_files.get_user_files_by_type(db, telegram_id, file_type, skip, limit)
+        files = crud_files.get_user_files_by_type(db, max_id, file_type, skip, limit)
     else:
-        files = crud_files.get_files_by_user(db, telegram_id, skip, limit)
+        files = crud_files.get_files_by_user(db, max_id, skip, limit)
 
     return files
 
@@ -173,10 +173,10 @@ async def get_file(
     Returns:
         File: File information.
     """
-    telegram_id = request.state.user_id
+    max_id = request.state.user_id
 
-    # Get user profile by telegram ID
-    profile = crud_profiles.get_profile_by_telegram(db, telegram_id)
+    # Get user profile by Max ID
+    profile = crud_profiles.get_profile_by_max_id(db, max_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
@@ -211,8 +211,8 @@ async def delete_file(
     """
     user_id = request.state.user_id
 
-    # Get user profile by telegram ID
-    profile = crud_profiles.get_profile_by_telegram(db, user_id)
+    # Get user profile by Max ID
+    profile = crud_profiles.get_profile_by_max_id(db, user_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 

@@ -62,10 +62,26 @@ class DocsAuthMiddleware(BaseHTTPMiddleware):
                 credentials = base64.b64decode(auth_header[6:]).decode()
                 username, password = credentials.split(":", 1)
 
+                # Strip whitespace from credentials and settings
+                username = username.strip()
+                password = password.strip()
+                expected_username = (settings.DOCS_USERNAME or "").strip()
+                expected_password = (settings.DOCS_PASSWORD or "").strip()
+
                 # Check credentials
-                if username == settings.DOCS_USERNAME and password == settings.DOCS_PASSWORD:
+                if username == expected_username and password == expected_password:
                     return await call_next(request)
                 else:
+                    # Log for debugging (remove in production)
+                    import logging
+
+                    logger = logging.getLogger(__name__)
+                    logger.warning(
+                        f"Failed auth attempt: username='{username}' "
+                        f"(expected '{expected_username}'), "
+                        f"password='{password[:3]}...' "
+                        f"(expected '{expected_password[:3]}...')"
+                    )
                     return Response(
                         content="Invalid credentials",
                         status_code=status.HTTP_401_UNAUTHORIZED,

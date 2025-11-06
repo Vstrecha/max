@@ -21,13 +21,13 @@ class FileBase(BaseModel):
     Attributes:
         name (str): Original file name.
         url (str): Public URL to the file in S3.
-        telegram_id (int): Telegram ID of the user who uploaded the file.
+        max_id (int): Max ID of the user who uploaded the file.
         type (FileType): Type of file (avatar/event).
     """
 
     name: str
     url: str
-    telegram_id: int
+    max_id: int
     type: FileType
 
 

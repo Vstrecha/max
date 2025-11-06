@@ -25,7 +25,7 @@ class ProfileBase(BaseModel):
         avatar (Optional[str]): ID of user's avatar file.
         university (str): User's university.
         bio (Optional[str]): User's biography.
-        telegram (Optional[int]): User's Telegram ID.
+        max_id (Optional[int]): User's Max ID.
         invited_by (Optional[str]): ID of the profile who invited this user.
     """
 
@@ -36,8 +36,9 @@ class ProfileBase(BaseModel):
     avatar: Optional[str] = None
     university: str
     bio: Optional[str] = None
-    telegram: Optional[int] = None
+    max_id: Optional[int] = None
     invited_by: Optional[str] = None
+    is_superuser: bool = False
 
 
 # --------------------------------------------------------------------------------
@@ -46,7 +47,7 @@ class ProfileBase(BaseModel):
 class ProfilePatch(BaseModel):
     """
     Schema for patching a profile (partial update).
-    Excludes protected fields: id, telegram, invited_by.
+    Excludes protected fields: id, max_id, invited_by.
 
     Attributes:
         first_name (Optional[str]): User's first name.
@@ -70,7 +71,7 @@ class ProfilePatch(BaseModel):
 class ProfileCreate(ProfilePatch):
     """
     Schema for creating a profile.
-    Excludes protected fields: id, telegram, invited_by.
+    Excludes protected fields: id, max_id, invited_by.
 
     Attributes:
         first_name (str): User's first name.
@@ -80,7 +81,6 @@ class ProfileCreate(ProfilePatch):
         avatar (Optional[str]): ID of user's avatar file.
         university (str): User's university.
         bio (Optional[str]): User's biography.
-        invitation (Optional[str]): id of invitation
     """
 
     first_name: str
@@ -90,7 +90,6 @@ class ProfileCreate(ProfilePatch):
     avatar: Optional[str] = None
     university: str
     bio: Optional[str] = None
-    invitation: Optional[str] = None
 
 
 # --------------------------------------------------------------------------------
