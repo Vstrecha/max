@@ -11,8 +11,6 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.db.crud import files as crud_files
-from app.db.crud import friends as crud_friends
-from app.db.crud import invitations as crud_invitations
 from app.db.crud import profiles as crud_profiles
 
 from ....api.v1.docs.examples.profile_examples import (
@@ -51,8 +49,9 @@ def profile_with_avatar_url(profile) -> dict:
         "avatar": profile.avatar,
         "university": profile.university,
         "bio": profile.bio,
-        "telegram": profile.telegram,
+        "max_id": profile.max_id,
         "invited_by": profile.invited_by,
+        "is_superuser": profile.is_superuser,
         "created_at": profile.created_at,
         "avatar_url": profile.avatar_file.url if profile.avatar_file else None,
     }
@@ -75,7 +74,7 @@ async def read_my_profile(request: Request, db: Session = Depends(get_db)):
         Profile: Current user's profile schema.
     """
     user_id = request.state.user_id
-    profile = crud_profiles.get_profile_by_telegram(db, user_id)
+    profile = crud_profiles.get_profile_by_max_id(db, user_id)
     if not profile:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     return profile_with_avatar_url(profile)
@@ -161,36 +160,13 @@ async def create_profile(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Avatar file not found"
             )
 
-    # Check if this is the first user (no profiles exist yet)
-    existing_profiles = crud_profiles.get_profiles(db, limit=1)
-
-    if len(existing_profiles) == 0:
-        # First user - no invitation required
-        profile = crud_profiles.create_profile(db, profile_in, telegram=user_id, invited_by=None)
-        return profile_with_avatar_url(profile)
-
-    # Check if invitation exists and is valid
-    if not profile_in.invitation:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invitation ID is required for new users",
-        )
-
-    invitation = crud_invitations.get_invitation_by_id(db, profile_in.invitation)
-    if not invitation:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid invitation ID")
-
-    profile_by_tg = crud_profiles.get_profile_by_telegram(db, user_id)
-    if profile_by_tg:
+    # Check if profile already exists
+    profile_by_max = crud_profiles.get_profile_by_max_id(db, user_id)
+    if profile_by_max:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Profile already exists")
 
-    profile = crud_profiles.create_profile(
-        db, profile_in, telegram=user_id, invited_by=invitation.user_id
-    )
-
-    # Create friendship between the inviter and the new user
-    crud_friends.create_friends(db, invitation.user_id, profile.id)
-
+    # Automatic registration - no invitation required
+    profile = crud_profiles.create_profile(db, profile_in, max_id=user_id, invited_by=None)
     return profile_with_avatar_url(profile)
 
 
@@ -212,8 +188,8 @@ async def update_profile(profile_in: ProfilePatch, request: Request, db: Session
     """
     user_id = request.state.user_id
 
-    # Get profile by telegram ID
-    profile = crud_profiles.get_profile_by_telegram(db, user_id)
+    # Get profile by Max ID
+    profile = crud_profiles.get_profile_by_max_id(db, user_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
@@ -257,7 +233,7 @@ async def delete_profile(profile_id: str, request: Request, db: Session = Depend
         raise HTTPException(status_code=404, detail="Profile not found")
 
     # Check if user owns this profile
-    if profile.telegram != user_id:
+    if profile.max_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="You can only delete your own profile"
         )

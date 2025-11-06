@@ -14,7 +14,7 @@ from app.core.config import settings
 
 def test_friends_endpoints_require_auth(client: TestClient) -> None:
     """
-    Test that friends endpoints require Telegram authorization.
+    Test that friends endpoints require Max authorization.
     """
     # Test without Authorization header
     response = client.get(f"{settings.API_VERSION}/friends/my")
@@ -77,7 +77,7 @@ def test_friends_endpoints_invalid_init_data(client: TestClient) -> None:
         f"{settings.API_VERSION}/friends/my", headers={"Authorization": "tma invalid_data"}
     )
     assert response.status_code == 403
-    assert "Invalid or expired Telegram init data" in response.json()["detail"]
+    assert "Invalid or expired Max init data" in response.json()["detail"]
 
     response = client.get(
         f"{settings.API_VERSION}/friends/secondary", headers={"Authorization": "tma invalid_data"}
@@ -105,7 +105,7 @@ def test_friends_endpoints_invalid_init_data(client: TestClient) -> None:
 
 def test_delete_friends_endpoint_requires_auth(client: TestClient) -> None:
     """
-    Test that delete friends endpoint requires Telegram authorization.
+    Test that delete friends endpoint requires Max authorization.
     """
     # Test without Authorization header
     response = client.delete(f"{settings.API_VERSION}/friends/test-profile-id")
@@ -125,4 +125,4 @@ def test_delete_friends_endpoint_requires_auth(client: TestClient) -> None:
         headers={"Authorization": "tma invalid_data"},
     )
     assert response.status_code == 403
-    assert "Invalid or expired Telegram init data" in response.json()["detail"]
+    assert "Invalid or expired Max init data" in response.json()["detail"]

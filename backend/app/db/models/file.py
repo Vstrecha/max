@@ -33,7 +33,7 @@ class File(Base):
         id (str): Primary key (UUID as string).
         name (str): Original file name.
         url (str): Public URL to the file in S3.
-        telegram_id (int): Telegram ID of the user who uploaded the file.
+        max_id (int): Max ID of the user who uploaded the file.
         type (FileType): Type of file (avatar/event).
         created_at (datetime): Record creation timestamp.
     """
@@ -43,7 +43,7 @@ class File(Base):
     id = Column(String, primary_key=True, index=True)
     name = Column(String, nullable=False)
     url = Column(String, nullable=False)
-    telegram_id = Column(BigInteger, nullable=False, index=True)
+    max_id = Column(BigInteger, nullable=False, index=True)
     type = Column(String, nullable=False)  # FileType enum
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
 

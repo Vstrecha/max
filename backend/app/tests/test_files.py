@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from PIL import Image
 
 from ..core.config import settings
-from .test_telegram_auth import create_test_init_data
+from .test_max_auth import create_test_init_data
 
 # --------------------------------------------------------------------------------
 
@@ -22,8 +22,8 @@ def create_profile_with_invite(client: TestClient, user_id: int, init_data: str)
 
     Args:
         client (TestClient): FastAPI test client.
-        user_id (int): User Telegram ID.
-        init_data (str): Telegram init data.
+        user_id (int): User Max ID.
+        init_data (str): Max init data.
 
     Returns:
         dict: Profile data.
@@ -37,7 +37,7 @@ def create_profile_with_invite(client: TestClient, user_id: int, init_data: str)
         "avatar": None,
         "university": "HSE University",
         "bio": "Software engineer with passion for technology.",
-        "telegram": user_id,
+        "max_id": user_id,
         "invitation": None,
     }
 
@@ -55,7 +55,7 @@ def create_profile_with_invite(client: TestClient, user_id: int, init_data: str)
         first_user_id = 999999999  # Special ID for first user
         first_init_data = create_test_init_data(first_user_id, settings.BOT_TOKEN)
         first_payload = payload.copy()
-        first_payload["telegram"] = first_user_id
+        first_payload["max_id"] = first_user_id
 
         first_response = client.post(
             f"{settings.API_VERSION}/profiles/",
@@ -69,10 +69,10 @@ def create_profile_with_invite(client: TestClient, user_id: int, init_data: str)
         else:
             # First user already exists, try to get any existing profile to create invitation
             # We'll use user ID 999999999 as our default inviter
-            first_user_data = {"telegram": first_user_id}
+            first_user_data = {"max_id": first_user_id}
 
         # Create invitation from the first user
-        first_init_data = create_test_init_data(first_user_data["telegram"], settings.BOT_TOKEN)
+        first_init_data = create_test_init_data(first_user_data["max_id"], settings.BOT_TOKEN)
         invite_response = client.post(
             f"{settings.API_VERSION}/profiles/invitations/",
             headers={"Authorization": f"tma {first_init_data}"},

@@ -16,14 +16,14 @@ from app.schemas.files import FileCreate
 # --------------------------------------------------------------------------------
 
 
-def create_file(db: Session, obj_in: FileCreate, telegram_id: int, url: str) -> File:
+def create_file(db: Session, obj_in: FileCreate, max_id: int, url: str) -> File:
     """
     Create a new file in the database.
 
     Args:
         db (Session): Database session.
         obj_in (FileCreate): Data for creating a file.
-        telegram_id (int): Telegram ID of the user who uploaded the file.
+        max_id (int): Max ID of the user who uploaded the file.
         url (str): Public URL to the file in S3.
 
     Returns:
@@ -33,7 +33,7 @@ def create_file(db: Session, obj_in: FileCreate, telegram_id: int, url: str) -> 
         id=str(uuid.uuid4()),
         name=obj_in.name,
         url=url,
-        telegram_id=telegram_id,
+        max_id=max_id,
         type=obj_in.type,
     )
     db.add(db_obj)
@@ -64,7 +64,7 @@ def get_file(db: Session, file_id: str) -> Optional[File]:
 
 def get_files_by_user(
     db: Session,
-    telegram_id: int,
+    max_id: int,
     skip: int = 0,
     limit: int = 100,
 ) -> list[File]:
@@ -73,14 +73,14 @@ def get_files_by_user(
 
     Args:
         db (Session): Database session.
-        telegram_id (int): Telegram ID.
+        max_id (int): Max ID.
         skip (int): Number of records to skip.
         limit (int): Maximum number of records to return.
 
     Returns:
         List[File]: List of file objects.
     """
-    return db.query(File).filter(File.telegram_id == telegram_id).offset(skip).limit(limit).all()
+    return db.query(File).filter(File.max_id == max_id).offset(skip).limit(limit).all()
 
 
 # --------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ def get_files_by_type(
 
 def get_user_files_by_type(
     db: Session,
-    telegram_id: int,
+    max_id: int,
     file_type: FileType,
     skip: int = 0,
     limit: int = 100,
@@ -122,7 +122,7 @@ def get_user_files_by_type(
 
     Args:
         db (Session): Database session.
-        telegram_id (int): Telegram ID.
+        max_id (int): Max ID.
         file_type (FileType): Type of files to retrieve.
         skip (int): Number of records to skip.
         limit (int): Maximum number of records to return.
@@ -132,7 +132,7 @@ def get_user_files_by_type(
     """
     return (
         db.query(File)
-        .filter(File.telegram_id == telegram_id, File.type == file_type)
+        .filter(File.max_id == max_id, File.type == file_type)
         .offset(skip)
         .limit(limit)
         .all()

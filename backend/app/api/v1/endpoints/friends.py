@@ -51,7 +51,7 @@ def profile_with_avatar_url(profile) -> dict:
         "avatar": profile.avatar,
         "university": profile.university,
         "bio": profile.bio,
-        "telegram": profile.telegram,
+        "max_id": profile.max_id,
         "invited_by": profile.invited_by,
         "created_at": profile.created_at,
         "avatar_url": profile.avatar_file.url if profile.avatar_file else None,
@@ -76,8 +76,8 @@ async def get_my_friends(request: Request, db: Session = Depends(get_db)):
     """
     user_id = request.state.user_id
 
-    # Get user profile by telegram ID
-    profile = crud_profiles.get_profile_by_telegram(db, user_id)
+    # Get user profile by Max ID
+    profile = crud_profiles.get_profile_by_max_id(db, user_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
@@ -106,8 +106,8 @@ async def get_friends(profile_id: str, request: Request, db: Session = Depends(g
     """
     user_id = request.state.user_id
 
-    # Get user profile by telegram ID
-    profile = crud_profiles.get_profile_by_telegram(db, user_id)
+    # Get user profile by Max ID
+    profile = crud_profiles.get_profile_by_max_id(db, user_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
@@ -147,8 +147,8 @@ async def get_secondary_friends(request: Request, db: Session = Depends(get_db))
     """
     user_id = request.state.user_id
 
-    # Get user profile by telegram ID
-    profile = crud_profiles.get_profile_by_telegram(db, user_id)
+    # Get user profile by Max ID
+    profile = crud_profiles.get_profile_by_max_id(db, user_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
@@ -177,8 +177,8 @@ async def delete_friends(profile_id: str, request: Request, db: Session = Depend
     """
     user_id = request.state.user_id
 
-    # Get user profile by telegram ID
-    profile = crud_profiles.get_profile_by_telegram(db, user_id)
+    # Get user profile by Max ID
+    profile = crud_profiles.get_profile_by_max_id(db, user_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
@@ -207,8 +207,8 @@ async def create_or_get_invitation(request: Request, db: Session = Depends(get_d
     """
     user_id = request.state.user_id
 
-    # Get user profile by telegram ID
-    profile = crud_profiles.get_profile_by_telegram(db, user_id)
+    # Get user profile by Max ID
+    profile = crud_profiles.get_profile_by_max_id(db, user_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 
@@ -267,8 +267,8 @@ async def create_friends_from_invitation(
     """
     user_id = request.state.user_id
 
-    # Get user profile by telegram ID
-    profile = crud_profiles.get_profile_by_telegram(db, user_id)
+    # Get user profile by Max ID
+    profile = crud_profiles.get_profile_by_max_id(db, user_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
 

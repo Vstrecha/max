@@ -95,9 +95,18 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         }
 
         # Log request body for non-GET requests (be careful with sensitive data)
-        if request.method not in ["GET", "HEAD", "OPTIONS"]:
+        # Skip body reading for documentation endpoints to avoid consuming the stream
+        if request.method not in ["GET", "HEAD", "OPTIONS"] and request.url.path not in [
+            "/docs",
+            "/redoc",
+            "/openapi.json",
+        ]:
             try:
-                body = await request.body()
+                # Read body only if it's available and not already consumed
+                if hasattr(request, "_body"):
+                    body = request._body
+                else:
+                    body = await request.body()
                 if body:
                     # Truncate body for logging (first 1000 chars)
                     body_str = body.decode()[:1000]
@@ -142,10 +151,18 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             return response
 
         except Exception as e:
-            # Log error
+            # Log error with full traceback
             process_time = time.time() - start_time
 
             logger.error(
-                f"Request failed - ID: {request_id}, Error: {str(e)}, " f"Time: {process_time:.4f}s"
+                f"Request failed - ID: {request_id}, Error: {str(e)}, Time: {process_time:.4f}s",
+                exc_info=True,
             )
-            raise
+            # Return error response instead of raising
+            from fastapi.responses import JSONResponse
+
+            return JSONResponse(
+                status_code=500,
+                content={"detail": f"Internal server error: {str(e)}"},
+                headers={"X-Request-Id": request_id},
+            )

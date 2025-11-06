@@ -19,12 +19,11 @@ class CRUDEvent:
             place=obj_in.place,
             start_date=obj_in.start_date,
             end_date=obj_in.end_date,
-            price=obj_in.price,
+            max_participants=obj_in.max_participants,
+            registration_start_date=obj_in.registration_start_date,
+            registration_end_date=obj_in.registration_end_date,
             creator=creator_id,
-            visability=obj_in.visability,
-            repeatability=obj_in.repeatability,
             status=obj_in.status,
-            telegram_chat_link=obj_in.telegram_chat_link,
         )
         # Set tags directly as PostgreSQL array
         db_obj.tags = obj_in.tags if obj_in.tags is not None else []
@@ -53,8 +52,6 @@ class CRUDEvent:
         limit: int = 100,
         last_event_id: Optional[str] = None,
         tags: Optional[list[str]] = None,
-        visability: Optional[str] = None,
-        repeatability: Optional[str] = None,
         user_id: Optional[str] = None,
     ) -> tuple[list[Event], int, bool]:
         """Get multiple events with filtering and pagination."""
@@ -79,48 +76,6 @@ class CRUDEvent:
                     tag_conditions.append(Event.tags.contains(f'"{tag}"'))
                 if tag_conditions:
                     query = query.filter(or_(*tag_conditions))
-
-        if visability:
-            query = query.filter(Event.visability == visability)
-        else:
-            # If no visibility filter specified, show public events and private
-            # events with friendship access
-            if user_id:
-                # Get user's friends
-                friends_query = db.query(Friends).filter(
-                    or_(Friends.user_1 == user_id, Friends.user_2 == user_id)
-                )
-                friend_ids = set()
-                for friendship in friends_query.all():
-                    if friendship.user_1 == user_id:
-                        friend_ids.add(friendship.user_2)
-                    else:
-                        friend_ids.add(friendship.user_1)
-
-                # Show public events OR private events where user is creator or
-                # has friend participating
-                query = query.filter(
-                    or_(
-                        Event.visability == "G",
-                        and_(
-                            Event.visability == "P",
-                            or_(
-                                Event.creator == user_id,
-                                Event.id.in_(
-                                    db.query(EventParticipation.event_id).filter(
-                                        EventParticipation.user_id.in_(friend_ids)
-                                    )
-                                ),
-                            ),
-                        ),
-                    )
-                )
-            else:
-                # No user context, show only public events
-                query = query.filter(Event.visability == "G")
-
-        if repeatability:
-            query = query.filter(Event.repeatability == repeatability)
 
         # Get total count before pagination
         total = query.count()
@@ -235,9 +190,21 @@ class CRUDEvent:
         return friends_of_friends_participating
 
     def participate_in_event(
-        self, db: Session, *, event_id: str, user_id: str, participation_type: str = "P"
+        self,
+        db: Session,
+        *,
+        event_id: str,
+        user_id: str,
+        participation_type: Optional[str] = None,
+        is_superuser: bool = False,
     ) -> EventParticipation:
         """Add user participation to an event."""
+        # If user is superuser, set participation_type to "a"
+        if is_superuser:
+            participation_type = "a"
+        elif participation_type is None:
+            participation_type = "P"
+
         # Check if participation already exists
         existing_participation = (
             db.query(EventParticipation)

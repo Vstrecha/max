@@ -1,0 +1,18 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+
+# Version control
+.git
+.gitignore
+
+# Environment variables
+.env
+.env.local
+
+
+# Misc
+.vscode
+README.md

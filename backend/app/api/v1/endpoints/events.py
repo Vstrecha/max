@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from app.core.config import ALL_TAGS
 from app.db.crud import events as crud_events
 from app.db.crud import profiles as crud_profiles
+from app.db.crud import qr_scans as crud_qr_scans
+from app.db.models.event import EventParticipation
 from app.db.session import get_db
 from app.schemas.events import (
     Event,
@@ -14,6 +16,7 @@ from app.schemas.events import (
     EventUpdate,
     EventWithParticipation,
 )
+from app.schemas.qr_scans import QRScanCreate, QRScanResponse
 
 router = APIRouter()
 
@@ -41,15 +44,13 @@ def get_global_events(
     limit: int = Query(20, ge=1, le=100),
     last_event_id: Optional[str] = Query(None),
     tags: Optional[list[str]] = Query(None),
-    visability: Optional[str] = Query(None, pattern="^[GP]$"),
-    repeatability: Optional[str] = Query(None, pattern="^[NR]$"),
 ):
     """
     Get global events with pagination and filtering.
     """
     current_user_id = request.state.user_id
     # Validate that the user exists and get profile ID
-    user = crud_profiles.get_profile_by_telegram(db, telegram_id=current_user_id)
+    user = crud_profiles.get_profile_by_max_id(db, max_id=current_user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
 
@@ -58,16 +59,36 @@ def get_global_events(
         limit=limit,
         last_event_id=last_event_id,
         tags=tags,
-        visability=visability,
-        repeatability=repeatability,
         user_id=user.id,
     )
 
     # Convert to EventWithParticipation format
     events_with_participation = []
     for event in events:
+        # Create event dict with is_registration_available
+        event_dict = {
+            "id": event.id,
+            "title": event.title,
+            "body": event.body,
+            "photo": event.photo,
+            "photo_url": event.photo_url,
+            "tags": event.tags or [],
+            "place": event.place,
+            "start_date": event.start_date,
+            "end_date": event.end_date,
+            "max_participants": event.max_participants,
+            "registration_start_date": event.registration_start_date,
+            "registration_end_date": event.registration_end_date,
+            "status": event.status,
+            "creator": event.creator,
+            "participants": event.participants_count,
+            "is_registration_available": event.is_registration_available,
+            "created_at": event.created_at,
+            "updated_at": event.updated_at,
+        }
+        event_obj = Event(**event_dict)
         event_data = EventWithParticipation(
-            event=event,
+            event=event_obj,
             friends_going=crud_events.event.get_friends_going_count(
                 db, event_id=event.id, user_id=user.id
             ),
@@ -103,25 +124,34 @@ def get_event_detail(
 
     current_user_id = request.state.user_id
     # Validate that the user exists and get profile ID
-    user = crud_profiles.get_profile_by_telegram(db, telegram_id=current_user_id)
+    user = crud_profiles.get_profile_by_max_id(db, max_id=current_user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
 
-    # Check if user has access to private events
-    if event.visability == "P":
-        # For private events, check if user is creator or has friendship connection
-        if event.creator != user.id:
-            # Check if any friends are going (indirect access)
-            friends_going = crud_events.event.get_friends_going_count(
-                db, event_id=event_id, user_id=user.id
-            )
-            if friends_going == 0:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN, detail="Access denied to private event"
-                )
-
+    # Create event dict with is_registration_available
+    event_dict = {
+        "id": event.id,
+        "title": event.title,
+        "body": event.body,
+        "photo": event.photo,
+        "photo_url": event.photo_url,
+        "tags": event.tags or [],
+        "place": event.place,
+        "start_date": event.start_date,
+        "end_date": event.end_date,
+        "max_participants": event.max_participants,
+        "registration_start_date": event.registration_start_date,
+        "registration_end_date": event.registration_end_date,
+        "status": event.status,
+        "creator": event.creator,
+        "participants": event.participants_count,
+        "is_registration_available": event.is_registration_available,
+        "created_at": event.created_at,
+        "updated_at": event.updated_at,
+    }
+    event_obj = Event(**event_dict)
     event_data = EventWithParticipation(
-        event=event,
+        event=event_obj,
         friends_going=crud_events.event.get_friends_going_count(
             db, event_id=event_id, user_id=user.id
         ),
@@ -152,7 +182,7 @@ def create_event(
     """
     current_user_id = request.state.user_id
     # Validate that the user exists
-    user = crud_profiles.get_profile_by_telegram(db, telegram_id=current_user_id)
+    user = crud_profiles.get_profile_by_max_id(db, max_id=current_user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
 
@@ -181,7 +211,7 @@ def update_event(
 
     current_user_id = request.state.user_id
     # Validate that the user exists and get profile ID
-    user = crud_profiles.get_profile_by_telegram(db, telegram_id=current_user_id)
+    user = crud_profiles.get_profile_by_max_id(db, max_id=current_user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
 
@@ -210,7 +240,7 @@ def delete_event(
 
     current_user_id = request.state.user_id
     # Validate that the user exists and get profile ID
-    user = crud_profiles.get_profile_by_telegram(db, telegram_id=current_user_id)
+    user = crud_profiles.get_profile_by_max_id(db, max_id=current_user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
 
@@ -245,7 +275,7 @@ def participate_in_event(
 
     current_user_id = request.state.user_id
     # Validate that the user exists and get profile ID
-    user = crud_profiles.get_profile_by_telegram(db, telegram_id=current_user_id)
+    user = crud_profiles.get_profile_by_max_id(db, max_id=current_user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
 
@@ -256,23 +286,40 @@ def participate_in_event(
             detail="Creators cannot participate in their own events",
         )
 
-    # Check if user can access the event
-    if event.visability == "P" and event.creator != user.id:
-        # For private events, check if user has friendship connection
-        friends_going = crud_events.event.get_friends_going_count(
-            db, event_id=event_id, user_id=user.id
+    # Check if registration is available
+    if not event.is_registration_available:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Registration is not available for this event",
         )
-        if friends_going == 0:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Access denied to private event"
-            )
 
-    # Add user participation
+    # Add user participation (check if user is superuser)
     crud_events.event.participate_in_event(
-        db, event_id=event_id, user_id=user.id, participation_type="P"
+        db, event_id=event_id, user_id=user.id, is_superuser=user.is_superuser
     )
 
-    return event
+    # Return event with is_registration_available
+    event_dict = {
+        "id": event.id,
+        "title": event.title,
+        "body": event.body,
+        "photo": event.photo,
+        "photo_url": event.photo_url,
+        "tags": event.tags or [],
+        "place": event.place,
+        "start_date": event.start_date,
+        "end_date": event.end_date,
+        "max_participants": event.max_participants,
+        "registration_start_date": event.registration_start_date,
+        "registration_end_date": event.registration_end_date,
+        "status": event.status,
+        "creator": event.creator,
+        "participants": event.participants_count,
+        "is_registration_available": event.is_registration_available,
+        "created_at": event.created_at,
+        "updated_at": event.updated_at,
+    }
+    return Event(**event_dict)
 
 
 @router.delete("/user_events/{event_id}", summary="Leave an event")
@@ -292,7 +339,7 @@ def leave_event(
 
     current_user_id = request.state.user_id
     # Validate that the user exists and get profile ID
-    user = crud_profiles.get_profile_by_telegram(db, telegram_id=current_user_id)
+    user = crud_profiles.get_profile_by_max_id(db, max_id=current_user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
 
@@ -330,7 +377,7 @@ def get_user_events(
     """
     current_user_id = request.state.user_id
     # Validate that the user exists and get profile ID
-    user = crud_profiles.get_profile_by_telegram(db, telegram_id=current_user_id)
+    user = crud_profiles.get_profile_by_max_id(db, max_id=current_user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
 
@@ -383,8 +430,30 @@ def get_user_events(
     # Convert to EventWithParticipation format
     events_with_participation = []
     for event in events:
+        # Create event dict with is_registration_available
+        event_dict = {
+            "id": event.id,
+            "title": event.title,
+            "body": event.body,
+            "photo": event.photo,
+            "photo_url": event.photo_url,
+            "tags": event.tags or [],
+            "place": event.place,
+            "start_date": event.start_date,
+            "end_date": event.end_date,
+            "max_participants": event.max_participants,
+            "registration_start_date": event.registration_start_date,
+            "registration_end_date": event.registration_end_date,
+            "status": event.status,
+            "creator": event.creator,
+            "participants": event.participants_count,
+            "is_registration_available": event.is_registration_available,
+            "created_at": event.created_at,
+            "updated_at": event.updated_at,
+        }
+        event_obj = Event(**event_dict)
         event_data = EventWithParticipation(
-            event=event,
+            event=event_obj,
             friends_going=crud_events.event.get_friends_going_count(
                 db, event_id=event.id, user_id=user.id
             ),
@@ -398,3 +467,38 @@ def get_user_events(
         events_with_participation.append(event_data)
 
     return EventListResponse(events=events_with_participation, total=total, has_more=has_more)
+
+
+@router.post(
+    "/scan_qr",
+    response_model=QRScanResponse,
+    summary="Scan QR code for event participation",
+)
+def scan_qr(
+    *,
+    request: Request,
+    db: Session = Depends(get_db),
+    scan_data: QRScanCreate,
+):
+    """
+    Scan QR code for event participation.
+    Creates a scan record and returns user_id and event_id.
+    """
+    current_user_id = request.state.user_id
+
+    # Get participation record
+    participation = (
+        db.query(EventParticipation)
+        .filter(EventParticipation.id == scan_data.participation_id)
+        .first()
+    )
+    if not participation:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Participation not found")
+
+    # Create QR scan record
+    crud_qr_scans.create_qr_scan(
+        db, participation_id=scan_data.participation_id, scanned_by_user_id=current_user_id
+    )
+
+    # Return user_id and event_id
+    return QRScanResponse(user_id=participation.user_id, event_id=participation.event_id)

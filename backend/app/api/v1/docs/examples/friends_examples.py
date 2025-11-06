@@ -28,7 +28,7 @@ get_friends_examples = {
                         "avatar_url": None,
                         "university": "HSE University",
                         "bio": "Software engineer.",
-                        "telegram": 123456789,
+                        "max_id": 123456789,
                         "invited_by": None,
                         "created_at": "2024-07-01T12:00:00+00:00",
                     },
@@ -178,7 +178,7 @@ get_secondary_friends_examples = {
                     "avatar_url": None,
                     "university": "Moscow Institute of Physics and Technology",
                     "bio": "Physicist.",
-                    "telegram": 555666777,
+                    "max_id": 555666777,
                     "invited_by": None,
                     "created_at": "2024-07-01T15:00:00+00:00",
                 }
