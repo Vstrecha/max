@@ -56,10 +56,10 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/default.conf:/etc/nginx/default.conf
-      - frontend-dist:/usr/share/nginx/html
-      - ${SSL_CERT_PATH}:/etc/ssl/fullchain.pem
-      - ${SSL_KEY_PATH}:/etc/ssl/privkey.pem
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - frontend-dist:/usr/share/nginx/html:ro
+      - ${SSL_CERT_PATH}:/etc/ssl/fullchain.pem:ro
+      - ${SSL_KEY_PATH}:/etc/ssl/privkey.pem:ro
     env_file:
       - .env
     depends_on:
