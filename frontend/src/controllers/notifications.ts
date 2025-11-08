@@ -1,6 +1,6 @@
 import { VNotificationType } from '@/types/Notification'
 import { showNotify, type NotifyType } from 'vant'
-import { haptic } from './max'
+import { haptic } from '@/controllers/max'
 import type { VError } from '@/types/Error'
 import log from 'loglevel'
 

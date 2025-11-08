@@ -1,5 +1,5 @@
 import { notify } from '@/controllers/notifications'
-import { haptic, open_max_link } from '@/controllers/max'
+import { haptic } from '@/controllers/max'
 import { useAppStore } from '@/stores/appStore'
 import {
   EventRepeatability,
@@ -95,11 +95,9 @@ export function useEventActions(event: Ref<VExtendedEvent>) {
     haptic.button_click()
     app_state.openExtendedEventCard(event.value, true)
   }
-  const open_chat = function () {
-    haptic.button_click()
 
-    if (event.value.event.telegram_chat_link) open_max_link(event.value.event.telegram_chat_link)
-    else notify(VNotificationType.ERROR, 'Не нашли ссылку на чат')
+  const open_qr = function () {
+    app_state.open_qr_code(event.value)
   }
   return {
     get_participants,
@@ -113,6 +111,6 @@ export function useEventActions(event: Ref<VExtendedEvent>) {
     is_viewer,
     invite,
     open_extended_card,
-    open_chat,
+    open_qr,
   }
 }

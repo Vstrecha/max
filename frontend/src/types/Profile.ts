@@ -27,7 +27,7 @@ const VProfileSchema = v.object({
     v.transform((value) => (value === null ? undefined : value)), // null -> undefined
     v.optional(v.string()),
   ),
-  max_id: v.number(),
+  telegram: v.number(),
   invited_by: v.pipe(
     v.any(),
     v.transform((value) => (value === null ? undefined : value)), // null -> undefined
@@ -64,7 +64,7 @@ const VProfileSkeleton = (): VProfile => ({
   avatar_url: undefined,
   university: '',
   bio: undefined,
-  max_id: 0,
+  telegram: 0,
   invited_by: '',
 })
 

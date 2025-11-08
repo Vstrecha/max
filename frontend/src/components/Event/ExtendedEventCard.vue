@@ -29,7 +29,7 @@ const {
   is_viewer,
   get_tags,
   invite,
-  open_chat,
+  open_qr,
 } = useEventActions(toRef(props, 'extended_event'))
 
 const select_event = () => {
@@ -93,7 +93,7 @@ const edit_event = () => {
 
       <div v-else class="event_buttons_group">
         <div>
-          <Button class="event_buttons_group_large" @click="open_chat" text="Открыть чат" />
+          <Button class="event_buttons_group_large" @click="open_qr" text="Открыть qr-код" />
         </div>
         <div>
           <Button
@@ -124,12 +124,10 @@ const edit_event = () => {
         <div>
           <h4 class="pop_up_text_title">До встречи!</h4>
           <p class="pop_up_text">
-            А пока можешь присоединиться к чату и всё обсудить, не забудь проявлять активность!
+            Успешно записали тебя. Список своих мероприятий ты всегда можешь найти на главной
+            странице!
           </p>
         </div>
-        <Row justify="center">
-          <Button @click="open_chat" text="Открыть чат" />
-        </Row>
       </div>
     </Popup>
   </div>

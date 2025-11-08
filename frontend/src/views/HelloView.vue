@@ -1,15 +1,11 @@
 <script setup lang="ts">
 import { notify } from '@/controllers/notifications'
-import { create_bot_contact, open_max_link } from '@/controllers/max'
 import { useAppStore } from '@/stores/appStore'
 import { VNotificationType } from '@/types/Notification'
 
 import { Row, Button } from 'vant'
 import { computed, ref, watch } from 'vue'
 
-const props = defineProps<{
-  status: 'new' | 'anonymous'
-}>()
 const app_state = useAppStore()
 
 const show_share_btn = ref(false)
@@ -27,7 +23,7 @@ const texts = {
 const title_text = computed(() => texts[props.status].title)
 const body_text = computed(() => texts[props.status].body)
 const open_chat = () => {
-  open_max_link('https://t.me/stud_vstrecha_bot')
+  open_tg_link('https://t.me/stud_vstrecha_bot')
   app_state.endRegistrationMode()
 }
 

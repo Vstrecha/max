@@ -2,27 +2,18 @@ import { createWebHistory, createRouter } from 'vue-router'
 
 import HelloView from '@/views/HelloView.vue'
 import FriendRequest from '@/components/utility/FriendRequest.vue'
-import OfficialView from '@/views/OfficialView.vue'
 import HomeView from '@/views/HomeView.vue'
 import EventsView from '@/views/EventsView.vue'
 import EventView from '@/views/EventView.vue'
 import MessageBoardView from '@/views/MessageBoardView.vue'
 import ProfileView from '@/views/ProfileView.vue'
-import InvitationView from '@/views/InvitationView.vue'
 import { backButton } from '@/controllers/max'
 import FriendsView from '@/views/FriendsView.vue'
 
 const routes = [
   {
-    path: '/official',
-    name: 'official',
-    props: true,
-    component: OfficialView,
-  },
-  {
-    path: '/welcome/:status',
+    path: '/welcome',
     name: 'welcome',
-    props: true,
     component: HelloView,
   },
   {
@@ -83,12 +74,6 @@ const routes = [
     component: FriendsView,
     props: true,
     meta: { isPopup: true },
-  },
-  {
-    path: '/invitation/:invitation',
-    name: 'invitation',
-    component: InvitationView,
-    props: true,
   },
 ]
 

@@ -67,5 +67,9 @@ export const useAppStore = defineStore('App', {
     openProfilePage(profile_id: string) {
       router.push({ name: 'profile', params: { profile_id: profile_id } })
     },
+
+    open_qr_code(event: VExtendedEvent) {
+      alert('todo')
+    },
   },
 })
