@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:17
-    container_name: total_postgres
+    container_name: max-postgres
     restart: unless-stopped
     env_file:
       - .env
@@ -51,7 +51,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: total_nginx
+    container_name: max-nginx
     ports:
       - "80:80"
       - "443:443"
@@ -63,9 +63,9 @@ services:
     env_file:
       - .env
     depends_on:
-      # - backend
+      - backend
       - frontend-builder
-      # - admin
+      - admin
 
 volumes:
   postgres_data:
