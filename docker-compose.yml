@@ -14,17 +14,17 @@ services:
     ports:
       - "5432:5432"
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    depends_on:
-      - db
-    volumes:
-      - ./backend:/app
-    working_dir: /app
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - ./backend:/app
+  #   working_dir: /app
 
   frontend-builder:
     build:
@@ -63,7 +63,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - backend
+      # - backend
       - frontend-builder
       # - admin
 
