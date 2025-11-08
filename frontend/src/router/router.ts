@@ -1,6 +1,6 @@
 import { createWebHistory, createRouter } from 'vue-router'
 
-import HelloView from '@/views/HelloView.vue'
+import WelcomeView from '@/views/WelcomeView.vue'
 import FriendRequest from '@/components/utility/FriendRequest.vue'
 import HomeView from '@/views/HomeView.vue'
 import EventsView from '@/views/EventsView.vue'
@@ -12,9 +12,10 @@ import FriendsView from '@/views/FriendsView.vue'
 
 const routes = [
   {
-    path: '/welcome',
+    path: '/welcome/:invitation?',
     name: 'welcome',
-    component: HelloView,
+    props: true,
+    component: WelcomeView,
   },
   {
     path: '/',

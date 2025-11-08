@@ -141,21 +141,18 @@ const create_profile = () => {
   const invitation = window.location.hash.slice(1)
 
   const new_profile: VCreateProfile = {
-    first_name: profile.value.first_name,
-    last_name: profile.value.last_name,
-    gender: profile.value.gender,
+    name: profile.value.name,
     birth_date: profile.value.birth_date,
     avatar: profile.value.avatar,
     university: profile.value.university,
-    bio: profile.value.bio,
     invitation: invitation,
   }
   ApiService.profile
     .create_profile(new_profile)
     .then((created_profile) => {
       user_state.profile = created_profile
-      notify(VNotificationType.SUCCESS, `${created_profile.first_name}, твой профиль создан!`)
-      app_state.showWelcomePage()
+      notify(VNotificationType.SUCCESS, `${created_profile.name}, твой профиль создан!`)
+      app_state.endRegistrationMode()
     })
     .catch((error) => {
       notify(VNotificationType.ERROR, `Не получилось создать профиль профиль. \n ${error}`)

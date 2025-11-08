@@ -19,7 +19,7 @@
       <AvatarImage
         width="170px"
         height="170px"
-        :signature="profile.first_name"
+        :signature="profile.name"
         :avatar_url="profile.avatar_url"
       />
       <div class="photo_edit" v-if="isEditing" @click="upload_photo">
@@ -67,7 +67,7 @@ const get_header = computed(() => {
   else return full_name
 })
 
-const full_name = computed(() => profile.value.first_name + ' ' + profile.value.last_name)
+const full_name = computed(() => profile.value.name)
 
 const upload_photo = function () {
   haptic.button_click()
