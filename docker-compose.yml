@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:17
-    container_name: vstrecha_postgres
+    container_name: total_postgres
     restart: unless-stopped
     env_file:
       - .env
@@ -18,8 +18,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
     env_file:
       - .env
     depends_on:
@@ -28,28 +26,20 @@ services:
       - ./backend:/app
     working_dir: /app
 
-  frontend:
+  frontend-builder:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "5173:5173"
+      dockerfile: Dockerfile.prod
     env_file:
       - .env
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - frontend-dist:/app/dist
     working_dir: /app
-    command: npm run dev -- --host
-    depends_on:
-      - backend
 
   admin:
     build:
       context: ./admin
       dockerfile: Dockerfile
-    ports:
-      - "8001:8001"
     env_file:
       - .env
     depends_on:
@@ -59,5 +49,24 @@ services:
     working_dir: /app
     command: ./start.sh
 
+  nginx:
+    image: nginx:alpine
+    container_name: total_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - frontend-dist:/usr/share/nginx/html
+      - ${SSL_CERT_PATH}:/etc/ssl/fullchain.pem
+      - ${SSL_KEY_PATH}:/etc/ssl/privkey.pem
+    env_file:
+      - .env
+    depends_on:
+      - backend
+      - frontend-builder
+      - admin
+
 volumes:
   postgres_data:
+  frontend-dist:
