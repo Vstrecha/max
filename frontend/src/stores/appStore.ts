@@ -1,4 +1,3 @@
-import type { VExtendedEvent } from '@/types/Event'
 import router from '@/router/router'
 
 import { defineStore } from 'pinia'
@@ -61,8 +60,16 @@ export const useAppStore = defineStore('App', {
       router.push({ name: 'profile', params: { profile_id: profile_id } })
     },
 
-    open_qr_code(event: VExtendedEvent) {
-      alert('todo')
+    openQRCode(text: string, description?: string) {
+      if (!text) return
+      this.isFullscreen = true
+      router.push({
+        name: 'qr_code',
+        query: {
+          text,
+          description,
+        },
+      })
     },
   },
 })

@@ -9,6 +9,7 @@ import MessageBoardView from '@/views/MessageBoardView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import { backButton } from '@/controllers/max'
 import FriendsView from '@/views/FriendsView.vue'
+import QRCodeView from '@/views/QRCodeView.vue'
 
 const routes = [
   {
@@ -16,6 +17,16 @@ const routes = [
     name: 'welcome',
     props: true,
     component: WelcomeView,
+  },
+  {
+    path: '/qr',
+    name: 'qr_code',
+    props: (route) => ({
+      text: route.query.text,
+      description: route.query.description,
+    }),
+    component: QRCodeView,
+    meta: { isPopup: true },
   },
   {
     path: '/',
