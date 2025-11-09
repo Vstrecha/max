@@ -97,7 +97,10 @@ export function useEventActions(event: Ref<VExtendedEvent>) {
   }
 
   const open_qr = function () {
-    app_state.open_qr_code(event.value)
+    haptic.button_click()
+    const qr_text = event.value.event.telegram_chat_link ?? event.value.event.id
+    const qr_description = `Покажи этот QR на «${event.value.event.title}»`
+    app_state.openQRCode(qr_text, qr_description)
   }
   return {
     get_participants,

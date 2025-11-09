@@ -1,4 +1,3 @@
-import type { VExtendedEvent } from '@/types/Event'
 import router from '@/router/router'
 
 import { defineStore } from 'pinia'
@@ -25,7 +24,7 @@ export const useAppStore = defineStore('App', {
       router.push({ name: 'friend_request', params: { invitation } })
     },
     openAnonymousMode() {
-      router.push({ name: 'welcome', params: { status: 'anonymous' } }).then(() => {
+      router.push({ name: 'welcome' }).then(() => {
         this.show_app = true
         this.isFullscreen = true
       })
@@ -36,16 +35,9 @@ export const useAppStore = defineStore('App', {
 
     openInvitationMode(invitation: string) {
       router
-        .push({ name: 'invitation', params: { invitation: invitation } })
+        .push({ name: 'welcome', params: { invitation } })
         .then(() => (this.show_app = true))
       this.isFullscreen = true
-    },
-    openRegistrationMode(invitation: string) {
-      router.push({ name: 'profile', hash: `#${invitation}`, params: { profile_id: 'new' } })
-      this.isFullscreen = true
-    },
-    showWelcomePage() {
-      router.push({ name: 'welcome', params: { status: 'new' } })
     },
     endRegistrationMode() {
       this.isFullscreen = false
@@ -68,8 +60,16 @@ export const useAppStore = defineStore('App', {
       router.push({ name: 'profile', params: { profile_id: profile_id } })
     },
 
-    open_qr_code(event: VExtendedEvent) {
-      alert('todo')
+    openQRCode(text: string, description?: string) {
+      if (!text) return
+      this.isFullscreen = true
+      router.push({
+        name: 'qr_code',
+        query: {
+          text,
+          description,
+        },
+      })
     },
   },
 })

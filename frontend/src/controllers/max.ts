@@ -5,6 +5,11 @@ const tg_state = {
   startParam: undefined as string | undefined,
 }
 
+type LandingPreview = {
+  name: string
+  avatar_url?: string
+}
+
 function init_app() {
   tg_state.initDataRaw = app.initData
   tg_state.startParam = app.initDataUnsafe.start_param
@@ -40,5 +45,10 @@ const share_url = (url: string, description: string) => {
   app.shareMaxContent(description, url)
 }
 
+const getLandingPreview = (): LandingPreview => ({
+  name: 'Анна Встречная',
+  avatar_url: '/logo.jpg',
+})
+
 init_app()
-export { tg_state, haptic, share_url, backButton }
+export { tg_state, haptic, share_url, backButton, getLandingPreview }

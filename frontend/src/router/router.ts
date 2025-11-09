@@ -1,6 +1,6 @@
 import { createWebHistory, createRouter } from 'vue-router'
 
-import HelloView from '@/views/HelloView.vue'
+import WelcomeView from '@/views/WelcomeView.vue'
 import FriendRequest from '@/components/utility/FriendRequest.vue'
 import HomeView from '@/views/HomeView.vue'
 import EventsView from '@/views/EventsView.vue'
@@ -9,12 +9,24 @@ import MessageBoardView from '@/views/MessageBoardView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import { backButton } from '@/controllers/max'
 import FriendsView from '@/views/FriendsView.vue'
+import QRCodeView from '@/views/QRCodeView.vue'
 
 const routes = [
   {
-    path: '/welcome',
+    path: '/welcome/:invitation?',
     name: 'welcome',
-    component: HelloView,
+    props: true,
+    component: WelcomeView,
+  },
+  {
+    path: '/qr',
+    name: 'qr_code',
+    props: (route) => ({
+      text: route.query.text,
+      description: route.query.description,
+    }),
+    component: QRCodeView,
+    meta: { isPopup: true },
   },
   {
     path: '/',

@@ -1,49 +1,14 @@
 <template>
   <div class="information">
-    <div v-if="isEditing">
-      <TextInput
-        class="info_field"
-        title="Имя"
-        v-model="profile.first_name"
-        :editing="isEditing"
-        required
-      />
-
-      <TextInput
-        class="info_field"
-        title="Фамилия"
-        v-model="profile.last_name"
-        :editing="isEditing"
-        required
-      />
-
-      <TextInput
-        class="info_field"
-        title="Пол"
-        v-model="profile.gender"
-        :editing="isEditing"
-        input_type="gender"
-        required
-      />
-
-      <TextInput
-        class="info_field"
-        title="День рождения"
-        v-model="profile.birth_date"
-        :editing="isEditing"
-        required
-        input_type="date"
-      />
-    </div>
+    <TextInput class="info_field" title="Имя" v-model="profile.name" :editing="isEditing" required />
 
     <TextInput
-      v-if="(profile.bio != null && profile.bio != '') || isEditing"
       class="info_field"
-      title="Статус"
-      :rows="3"
-      :max_len="150"
-      v-model="profile.bio"
+      title="Дата рождения"
+      v-model="profile.birth_date"
       :editing="isEditing"
+      required
+      input_type="date"
     />
 
     <TextInput
@@ -66,7 +31,7 @@
               v-for="friend in friends?.slice(0, 4)"
               :key="friend.id"
               :avatar_url="friend.avatar_url"
-              :signature="friend.first_name"
+              :signature="friend.name"
               width="27px"
               height="27px"
               border-weight="1"

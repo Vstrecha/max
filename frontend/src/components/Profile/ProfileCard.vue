@@ -27,7 +27,7 @@ const get_color = computed(() =>
       width="47px"
       height="47px"
       border-weight="2"
-      :signature="profile.first_name"
+      :signature="profile.name"
       :avatar_url="profile.avatar_url"
       :friend="friend"
     />
