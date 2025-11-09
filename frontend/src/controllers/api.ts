@@ -6,7 +6,7 @@ import {
   type VEvent,
   type VExtendedEventsRespond,
 } from '@/types/Event'
-import { max_state } from './max'
+import { tg_state } from './max'
 import {
   VProfileOrUndefinedSchema,
   VProfileSchema,
@@ -23,10 +23,10 @@ import log from 'loglevel'
 import { VFileSchema, type VFile, type VFileTypeType } from '@/types/Files'
 
 const XRequestId = generate_request_id()
-const tmaToken = max_state.initDataRaw
+const tmaToken = tg_state.initDataRaw
 
 const apiClient = axios.create({
-  baseURL: 'https://horseshoe-crab.ru/api/v1',
+  baseURL: 'https://max-total.ru/api/v1',
   headers: {
     'Content-Type': 'application/json',
     'X-Request-Id': XRequestId,
@@ -216,10 +216,6 @@ const ApiService = {
 
 function generate_request_id(): string {
   return uuidv4()
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 // response: AxiosResponse<unknown, unknown>,

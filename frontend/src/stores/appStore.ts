@@ -1,8 +1,8 @@
-import type { VExtendedEvent } from '@/types/Event'
 import router from '@/router/router'
 
 import { defineStore } from 'pinia'
 import type { VProfile } from '@/types/Profile'
+import type { VExtendedEvent } from '@/types/Event'
 
 const add_position = (callback: () => void) => {
   const currentPath = router.currentRoute.value.path
@@ -25,27 +25,14 @@ export const useAppStore = defineStore('App', {
       router.push({ name: 'friend_request', params: { invitation } })
     },
     openAnonymousMode() {
-      router.push({ name: 'welcome', params: { status: 'anonymous' } }).then(() => {
+      router.push({ name: 'welcome' }).then(() => {
         this.show_app = true
         this.isFullscreen = true
       })
     },
-    open_official() {
-      router.push({ name: 'official' })
-    },
-
     openInvitationMode(invitation: string) {
-      router
-        .push({ name: 'invitation', params: { invitation: invitation } })
-        .then(() => (this.show_app = true))
+      router.push({ name: 'welcome', params: { invitation } }).then(() => (this.show_app = true))
       this.isFullscreen = true
-    },
-    openRegistrationMode(invitation: string) {
-      router.push({ name: 'profile', hash: `#${invitation}`, params: { profile_id: 'new' } })
-      this.isFullscreen = true
-    },
-    showWelcomePage() {
-      router.push({ name: 'welcome', params: { status: 'new' } })
     },
     endRegistrationMode() {
       this.isFullscreen = false
@@ -66,6 +53,17 @@ export const useAppStore = defineStore('App', {
     },
     openProfilePage(profile_id: string) {
       router.push({ name: 'profile', params: { profile_id: profile_id } })
+    },
+
+    openQRCode(qr_code: string, description?: string) {
+      this.isFullscreen = true
+      router.push({
+        name: 'qr_code',
+        params: {
+          qr_code,
+          description,
+        },
+      })
     },
   },
 })

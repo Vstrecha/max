@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TabBar from '@/components/TabBar.vue'
 import { useAppStore } from '@/stores/appStore'
-import { max_state } from '@/controllers/max'
+import { tg_state } from '@/controllers/max'
 import { useUserStore } from './stores/userStore'
 import { ApiService } from './controllers/api'
 import { onMounted, onUnmounted } from 'vue'
@@ -12,7 +12,7 @@ const app_state = useAppStore()
 const user_state = useUserStore()
 
 async function init() {
-  if (max_state.startParam === undefined) {
+  if (tg_state.startParam === undefined) {
     app_state.show_app = true
   }
 
@@ -32,11 +32,11 @@ async function init() {
     }
   }
 
-  if (max_state.startParam != undefined) {
+  if (tg_state.startParam != undefined) {
     if (user_state.profile == undefined) {
-      app_state.openInvitationMode(max_state.startParam)
+      app_state.openInvitationMode(tg_state.startParam)
     } else {
-      app_state.openFriendRequestMode(max_state.startParam)
+      app_state.openFriendRequestMode(tg_state.startParam)
     }
   } else if (user_state.profile == undefined) {
     app_state.openAnonymousMode()

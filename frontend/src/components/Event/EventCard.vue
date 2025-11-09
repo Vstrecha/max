@@ -21,7 +21,6 @@ const {
   get_tags,
   invite,
   open_extended_card,
-  open_chat,
 } = useEventActions(toRef(props, 'extended_event'))
 
 const event = props.extended_event.event
@@ -60,10 +59,6 @@ const event = props.extended_event.event
     </div>
     <div v-if="!is_viewer" class="event_buttons_wrap">
       <div class="event_button" @click.stop="invite"><span>Поделиться</span></div>
-      <div class="event_button_space"></div>
-      <div class="event_button" @click.stop="open_chat">
-        <span>Открыть чат</span>
-      </div>
     </div>
   </div>
 </template>

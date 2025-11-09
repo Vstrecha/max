@@ -1,29 +1,28 @@
 import { createWebHistory, createRouter } from 'vue-router'
 
-import HelloView from '@/views/HelloView.vue'
+import WelcomeView from '@/views/WelcomeView.vue'
 import FriendRequest from '@/components/utility/FriendRequest.vue'
-import OfficialView from '@/views/OfficialView.vue'
 import HomeView from '@/views/HomeView.vue'
 import EventsView from '@/views/EventsView.vue'
 import EventView from '@/views/EventView.vue'
-import MessageBoardView from '@/views/MessageBoardView.vue'
 import ProfileView from '@/views/ProfileView.vue'
-import InvitationView from '@/views/InvitationView.vue'
 import { backButton } from '@/controllers/max'
 import FriendsView from '@/views/FriendsView.vue'
+import QRCodeView from '@/views/QRCodeView.vue'
 
 const routes = [
   {
-    path: '/official',
-    name: 'official',
-    props: true,
-    component: OfficialView,
-  },
-  {
-    path: '/welcome/:status',
+    path: '/welcome/:invitation?',
     name: 'welcome',
     props: true,
-    component: HelloView,
+    component: WelcomeView,
+  },
+  {
+    path: '/qr/:qr_code/:description',
+    name: 'qr_code',
+    props: true,
+    component: QRCodeView,
+    meta: { isPopup: true },
   },
   {
     path: '/',
@@ -59,12 +58,6 @@ const routes = [
     meta: { isPopup: true },
   },
   {
-    path: '/message_board/',
-    name: 'message_board',
-    component: MessageBoardView,
-    props: true,
-  },
-  {
     path: '/profile/my',
     name: 'my_profile',
     component: ProfileView,
@@ -83,12 +76,6 @@ const routes = [
     component: FriendsView,
     props: true,
     meta: { isPopup: true },
-  },
-  {
-    path: '/invitation/:invitation',
-    name: 'invitation',
-    component: InvitationView,
-    props: true,
   },
 ]
 

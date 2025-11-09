@@ -29,7 +29,7 @@ export function useProfileActions(profile: Ref<VProfile>) {
 
     return get_years_string(yearsPassed)
   })
-  const get_name = computed(() => profile.value.first_name + ' ' + profile.value.last_name)
+  const get_name = computed(() => profile.value.name)
   return {
     get_full_age,
     get_name,
