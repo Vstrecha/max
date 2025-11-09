@@ -2,7 +2,7 @@
 import AvatarImage from '@/components/utility/AvatarImage.vue'
 import TextInput from '@/components/utility/TextInput.vue'
 import { ApiService } from '@/controllers/api'
-import { haptic } from '@/controllers/max'
+import { haptic, tg_state } from '@/controllers/max'
 import { notify } from '@/controllers/notifications'
 import { useAppStore } from '@/stores/appStore'
 import { useUserStore } from '@/stores/userStore'
@@ -17,6 +17,8 @@ const app_state = useAppStore()
 const user_state = useUserStore()
 
 const profileForm = ref(VProfileSkeleton())
+if (tg_state.user_name) 
+  profileForm.value.name = tg_state.user_name
 
 const fileInput = ref<HTMLInputElement | null>(null)
 const isUploadingAvatar = ref(false)

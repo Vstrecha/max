@@ -3,17 +3,15 @@ const app = window.WebApp
 const tg_state = {
   initDataRaw: undefined as string | undefined,
   startParam: undefined as string | undefined,
+
+  user_name: undefined as string | undefined,
 }
 
-type LandingPreview = {
-  name: string
-  avatar_url?: string
-}
 
 function init_app() {
-  debugger
   tg_state.initDataRaw = app.initData
   tg_state.startParam = app.initDataUnsafe.start_param
+  tg_state.user_name = app.initDataUnsafe.user.first_name + app.initDataUnsafe.user.last_name
 
   const platform = app.platform
   console.log(platform)
@@ -46,10 +44,6 @@ const share_url = (url: string, description: string) => {
   app.shareMaxContent(description, url)
 }
 
-const getLandingPreview = (): LandingPreview => ({
-  name: 'Анна Встречная',
-  avatar_url: '/logo.jpg',
-})
 
 init_app()
-export { tg_state, haptic, share_url, backButton, getLandingPreview }
+export { tg_state, haptic, share_url, backButton }
