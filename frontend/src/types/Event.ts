@@ -1,19 +1,5 @@
 import * as v from 'valibot'
 
-const EventVisability = {
-  GLOBAL: 'G',
-  PRIVATE: 'P',
-} as const
-
-type EventVisabilityType = (typeof EventVisability)[keyof typeof EventVisability]
-
-const EventRepeatability = {
-  NONE: 'N',
-  REPEATABLE: 'R',
-} as const
-
-type EventRepeatabilityType = (typeof EventRepeatability)[keyof typeof EventRepeatability]
-
 const EventStatus = {
   ACTIVE: 'A',
   ENDED: 'E',
@@ -23,8 +9,6 @@ type EventStatusType = (typeof EventStatus)[keyof typeof EventStatus]
 
 type EventsFilter = {
   tags?: string[]
-  visability?: EventVisabilityType
-  repeatability?: EventRepeatabilityType
   status?: EventStatusType
 }
 
@@ -55,21 +39,25 @@ const VEventSchema = v.object({
   ),
   start_date: v.pipe(v.string(), v.isoDate('Дата должна быть в формате YYYY-MM-DD')),
   end_date: v.pipe(v.string(), v.isoDate('Дата должна быть в формате YYYY-MM-DD')),
-  price: v.pipe(
-    v.any(),
-    v.transform((value) => (value === null ? undefined : value)), // null -> undefined
-    v.optional(v.pipe(v.number(), v.minValue(0, 'Цена не может быть меньше нуля'))),
-  ),
+
   participants: v.number(),
-  creator: v.string(),
-  visability: v.enum(EventVisability),
-  repeatability: v.enum(EventRepeatability),
-  status: v.enum(EventStatus),
-  telegram_chat_link: v.pipe(
+  max_participants: v.pipe(
     v.any(),
     v.transform((value) => (value === null ? undefined : value)), // null -> undefined
-    v.optional(v.string()),
+    v.optional(v.number()),
   ),
+  creator: v.string(),
+  registration_start_date: v.pipe(
+    v.any(),
+    v.transform((value) => (value === null ? undefined : value)), // null -> undefined
+    v.optional(v.pipe(v.string(), v.isoDate('Дата должна быть в формате YYYY-MM-DD'))),
+  ),
+  registration_end_date: v.pipe(
+    v.any(),
+    v.transform((value) => (value === null ? undefined : value)), // null -> undefined
+    v.optional(v.pipe(v.string(), v.isoDate('Дата должна быть в формате YYYY-MM-DD'))),
+  ),
+  status: v.enum(EventStatus),
 })
 type VEvent = v.InferInput<typeof VEventSchema>
 
@@ -100,16 +88,15 @@ const VExtendedEventSkeleton = (): VExtendedEvent => ({
     body: '',
     photo: undefined,
     photo_url: undefined,
-    price: undefined,
     place: undefined,
-    telegram_chat_link: undefined,
     tags: [],
     start_date: new Date().toISOString().split('T')[0],
     end_date: new Date().toISOString().split('T')[0],
     participants: 0,
+    max_participants: undefined,
+    registration_start_date: undefined,
+    registration_end_date: undefined,
     creator: '',
-    visability: 'G',
-    repeatability: 'N',
     status: 'A',
   },
   friends_going: 0,
@@ -117,8 +104,6 @@ const VExtendedEventSkeleton = (): VExtendedEvent => ({
 })
 
 export {
-  EventVisability,
-  EventRepeatability,
   EventStatus,
   VEventSchema,
   VExtendedEventSchema,
@@ -127,8 +112,6 @@ export {
   VExtendedEventsRespondSchema,
 }
 export type {
-  EventVisabilityType,
-  EventRepeatabilityType,
   EventStatusType,
   VEvent,
   VExtendedEvent,

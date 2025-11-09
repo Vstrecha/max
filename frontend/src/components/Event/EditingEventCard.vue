@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import {
-  EventRepeatability,
-  EventVisability,
   type VEvent,
   type VExtendedEvent,
 } from '@/types/Event'
@@ -13,17 +11,13 @@ import { VNotificationType } from '@/types/Notification'
 import { haptic } from '@/controllers/max'
 import RequiredField from '@/components/utility/RequiredField.vue'
 
-import { computed, ref, toRaw, useTemplateRef } from 'vue'
+import { ref, toRaw, useTemplateRef } from 'vue'
 import {
   MapPin,
   CalendarClock,
-  RussianRuble,
-  LockOpen,
-  Repeat2,
   Pencil,
-  ExternalLink,
 } from 'lucide-vue-next'
-import { Button, Image as VanImage, Switch, Field, CellGroup } from 'vant'
+import { Button, Image as VanImage, Field, CellGroup } from 'vant'
 
 const props = defineProps<{
   extended_event: VExtendedEvent
@@ -39,24 +33,6 @@ const event = ref(structuredClone(toRaw(props.extended_event.event)))
 
 const upload_photo_input = useTemplateRef('upload_photo_input')
 
-const is_private_event = computed({
-  get() {
-    return event.value.visability === EventVisability.PRIVATE
-  },
-  set(set_private) {
-    event.value.visability = set_private ? EventVisability.PRIVATE : EventVisability.GLOBAL
-  },
-})
-const is_repeatable_event = computed({
-  get() {
-    return event.value.repeatability === EventRepeatability.REPEATABLE
-  },
-  set(set_repeatable) {
-    event.value.repeatability = set_repeatable
-      ? EventRepeatability.REPEATABLE
-      : EventRepeatability.NONE
-  },
-})
 
 const select_tag = (tag: string) => {
   haptic.button_click()
@@ -175,25 +151,6 @@ const update_event = async () => {
 
       <div class="info_group">
         <div class="info_border_wrap">
-          <div class="info_field_flex">
-            <RussianRuble :size="18" color="var(--var-secondary-emph-color)" />
-            <div class="input_field_wrap info_field_input">
-              <CellGroup inset>
-                <Field
-                  v-model.number="event.price"
-                  type="number"
-                  placeholder="Укажите стоимость"
-                  rows="1"
-                  autosize
-                />
-              </CellGroup>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="info_group">
-        <div class="info_border_wrap">
           <div class="edit_date_group">
             <CalendarClock :size="20" color="var(--var-secondary-emph-color)" />
             <RequiredField font_size="18" keep_free_space height="32" />
@@ -218,17 +175,6 @@ const update_event = async () => {
           Ссылка на общий чат <RequiredField font_size="18" />
           <p class="info_group_hint">Создайте чат и приложите ссылку</p>
         </h4>
-
-        <div class="info_border_wrap">
-          <div class="info_field_flex">
-            <ExternalLink :size="18" color="var(--var-secondary-emph-color)" />
-            <div class="input_field_wrap info_field_input">
-              <CellGroup inset>
-                <Field v-model="event.telegram_chat_link" type="text" placeholder="t.me/+...." />
-              </CellGroup>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div class="info_group">
@@ -244,36 +190,6 @@ const update_event = async () => {
                 autosize
               />
             </CellGroup>
-          </div>
-        </div>
-      </div>
-
-      <div class="info_group">
-        <div class="info_border_wrap">
-          <div class="info_field_flex">
-            <LockOpen :size="18" color="var(--var-secondary-emph-color)" />
-            <div class="toggle_option_text_wrap">
-              <span class="toggle_option_text_title">Приватное</span>
-              <span class="toggle_option_text_description"
-                >Увидят только друзья и друзья друзей</span
-              >
-            </div>
-
-            <Switch v-model="is_private_event" />
-          </div>
-        </div>
-      </div>
-
-      <div class="info_group">
-        <div class="info_border_wrap">
-          <div class="info_field_flex">
-            <Repeat2 :size="19" color="var(--var-secondary-emph-color)" />
-            <div class="toggle_option_text_wrap">
-              <span class="toggle_option_text_title">Регулярное</span>
-              <span class="toggle_option_text_description">Будет несколько встреч</span>
-            </div>
-
-            <Switch v-model="is_repeatable_event" />
           </div>
         </div>
       </div>

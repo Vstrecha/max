@@ -1,8 +1,6 @@
 import {
   VEventSchema,
   VExtendedEventsRespondSchema,
-  type EventRepeatabilityType,
-  type EventVisabilityType,
   type VEvent,
   type VExtendedEventsRespond,
 } from '@/types/Event'
@@ -92,16 +90,12 @@ const EventsApi = {
     limit: number,
     last_event_id?: string,
     tags?: string[],
-    visability?: EventVisabilityType,
-    repeatability?: EventRepeatabilityType,
   ): Promise<VExtendedEventsRespond> {
     const url = `/events/global_events/`
     const params = {
       limit,
       last_event_id,
       tags,
-      visability,
-      repeatability,
     }
     const response = await apiClient.get(url, { params })
     return parse_response(VExtendedEventsRespondSchema, response.data)
@@ -110,16 +104,12 @@ const EventsApi = {
     limit: number,
     last_event_id?: string,
     tags?: string[],
-    visability?: EventVisabilityType,
-    repeatability?: EventRepeatabilityType,
   ): Promise<VExtendedEventsRespond> {
     const url = `/events/user_events/`
     const params = {
       limit,
       last_event_id,
       tags,
-      visability,
-      repeatability,
     }
     const response = await apiClient.get(url, { params })
     return parse_response(VExtendedEventsRespondSchema, response.data)

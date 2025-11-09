@@ -14,8 +14,6 @@ const load_events = async (last_event_id?: string, events_filter?: EventsFilter)
       EVENTS_LOAD_PER_REQUEST,
       last_event_id,
       events_filter?.tags,
-      events_filter?.visability,
-      events_filter?.repeatability,
     )
     return new_events
   } catch (error) {

@@ -1,10 +1,10 @@
 <template>
   <div class="information">
-    <TextInput class="info_field" title="Имя" v-model="profile.first_name" :editing="true" required />
+    <TextInput class="info_field" title="Имя" v-model="profile.first_name" :editing="isEditing" required />
 
-    <TextInput class="info_field" title="Фамилия" v-model="profile.last_name" :editing="true" required />
+    <TextInput class="info_field" title="Фамилия" v-model="profile.last_name" :editing="isEditing" required />
 
-    <TextInput class="info_field" title="Пол" v-model="profile.gender" :editing="true" input_type="gender" required />
+    <TextInput class="info_field" title="Пол" v-model="profile.gender" :editing="isEditing" input_type="gender" required />
     <TextInput class="info_field" title="Дата рождения" v-model="profile.birth_date" :editing="isEditing" required
       input_type="date" />
 

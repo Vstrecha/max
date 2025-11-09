@@ -3,7 +3,7 @@ import { type VExtendedEvent } from '@/types/Event'
 import IconedTextField from '@/components/utility/IconedTextField.vue'
 import { useEventActions } from '@/composables/useEventActions'
 
-import { LockOpen, MapPin, CalendarClock, Repeat2, Users } from 'lucide-vue-next'
+import { MapPin, CalendarClock, Users } from 'lucide-vue-next'
 import { Image as VanImage } from 'vant'
 import { toRef } from 'vue'
 
@@ -14,8 +14,6 @@ const props = defineProps<{
 // TODO move it to class
 const {
   get_participants,
-  is_private,
-  is_repeatable,
   is_viewer,
   get_formatted_date,
   get_tags,
@@ -34,11 +32,6 @@ const event = props.extended_event.event
         <div class="event_tags">
           {{ get_tags }}
         </div>
-      </div>
-      <div class="event_marks">
-        <Repeat2 v-if="is_repeatable" :size="17" color="var(--var-secondary-emph-color)" />
-        <div class="event_marks_space"></div>
-        <LockOpen v-if="is_private" :size="17" color="var(--var-secondary-emph-color)" />
       </div>
     </div>
     <div class="event_body">

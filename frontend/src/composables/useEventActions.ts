@@ -2,8 +2,6 @@ import { notify } from '@/controllers/notifications'
 import { haptic } from '@/controllers/max'
 import { useAppStore } from '@/stores/appStore'
 import {
-  EventRepeatability,
-  EventVisability,
   ParticipationType,
   type VExtendedEvent,
 } from '@/types/Event'
@@ -41,19 +39,9 @@ export function useEventActions(event: Ref<VExtendedEvent>) {
     )
   })
 
-  const is_private = computed(() => event.value.event.visability == EventVisability.PRIVATE)
-  const is_repeatable = computed(
-    () => event.value.event.repeatability == EventRepeatability.REPEATABLE,
-  )
+
   const is_creator = computed(() => event.value.participation_type == ParticipationType.CREATOR)
   const is_viewer = computed(() => event.value.participation_type == ParticipationType.VIEWER)
-
-  const get_visability = computed(() =>
-    event.value.event.visability == EventVisability.PRIVATE ? 'Приватное' : 'Публичное',
-  )
-  const get_repeatability = computed(() =>
-    event.value.event.repeatability == EventRepeatability.REPEATABLE ? 'Регулярное' : 'Разовое',
-  )
 
   const get_formatted_date = computed((): string => {
     const startDate = new Date(event.value.event.start_date)
@@ -98,7 +86,7 @@ export function useEventActions(event: Ref<VExtendedEvent>) {
 
   const open_qr = function () {
     haptic.button_click()
-    const qr_text = event.value.event.telegram_chat_link ?? event.value.event.id
+    const qr_text = event.value.event.id
     const qr_description = `Покажи этот QR на «${event.value.event.title}»`
     app_state.openQRCode(qr_text, qr_description)
   }
@@ -106,10 +94,6 @@ export function useEventActions(event: Ref<VExtendedEvent>) {
     get_participants,
     get_formatted_date,
     get_tags,
-    get_visability,
-    get_repeatability,
-    is_private,
-    is_repeatable,
     is_creator,
     is_viewer,
     invite,

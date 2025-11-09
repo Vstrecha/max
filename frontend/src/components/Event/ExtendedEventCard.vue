@@ -3,7 +3,7 @@ import { useEventActions } from '@/composables/useEventActions'
 import { type VExtendedEvent } from '@/types/Event'
 import IconedTextField from '@/components/utility/IconedTextField.vue'
 
-import { MapPin, CalendarClock, Users, RussianRuble, LockOpen, Repeat2 } from 'lucide-vue-next'
+import { MapPin, CalendarClock, Users } from 'lucide-vue-next'
 import { Button, Image as VanImage, Popup } from 'vant'
 import { toRef } from 'vue'
 import { haptic } from '@/controllers/max'
@@ -22,8 +22,6 @@ const emit = defineEmits<{
 
 const {
   get_participants,
-  get_visability,
-  get_repeatability,
   get_formatted_date,
   is_creator,
   is_viewer,
@@ -69,7 +67,7 @@ const edit_event = () => {
           </IconedTextField>
         </div>
         <div class="event_info_part">
-          <IconedTextField margin="8px 0" :text="extended_event.event.price ?? 'Неизвестно'">
+          <!-- <IconedTextField margin="8px 0" :text="extended_event.event.price ?? 'Неизвестно'">
             <RussianRuble :size="25" color="var(--var-secondary-emph-color)" />
           </IconedTextField>
           <IconedTextField margin="8px 0" :text="get_visability">
@@ -77,7 +75,7 @@ const edit_event = () => {
           </IconedTextField>
           <IconedTextField margin="8px 0" :text="get_repeatability">
             <Repeat2 :size="25" color="var(--var-secondary-emph-color)" />
-          </IconedTextField>
+          </IconedTextField> -->
         </div>
       </div>
 
