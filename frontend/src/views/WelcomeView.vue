@@ -228,19 +228,18 @@ const submitProfile = async () => {
             >
               Зарегистрироваться
             </Button>
-            <span class="agreement_text">
-              Нажимая кнопку, ты соглашаешься с
-              <span class="agreement_link" @click.stop="app_state.open_official">
-                публичной офертой
-              </span>
-              и обработкой персональных данных.
-            </span>
           </div>
         </div>
       </div>
     </section>
   </section>
-  <input type="file" ref="fileInput" class="hidden_input" accept="image/*" @change="onAvatarSelected" />
+  <input
+    type="file"
+    ref="fileInput"
+    class="hidden_input"
+    accept="image/*"
+    @change="onAvatarSelected"
+  />
 </template>
 
 <style scoped>
