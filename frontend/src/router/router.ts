@@ -12,9 +12,8 @@ import QRCodeView from '@/views/QRCodeView.vue'
 
 const routes = [
   {
-    path: '/welcome/:invitation?',
+    path: '/welcome/',
     name: 'welcome',
-    props: true,
     component: WelcomeView,
   },
   {

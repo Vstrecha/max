@@ -30,16 +30,11 @@ async function init() {
       notify(VNotificationType.ERROR, `Не смогли загрузить список друзей. \n ${error}`)
       return
     }
-  }
-
-  if (tg_state.startParam != undefined) {
-    if (user_state.profile == undefined) {
-      app_state.openInvitationMode(tg_state.startParam)
-    } else {
+    if (tg_state.startParam != undefined) {
       app_state.openFriendRequestMode(tg_state.startParam)
     }
-  } else if (user_state.profile == undefined) {
-    app_state.openAnonymousMode()
+  } else {
+    app_state.openRegistrationMode()
   }
 }
 const handleFocusIn = (e: FocusEvent) => {

@@ -31,7 +31,6 @@ type VCreateProfile = {
   birth_date: string
   avatar: string | undefined
   university: string
-  invitation: string
 }
 
 const VProfileSkeleton = (): VProfile => ({

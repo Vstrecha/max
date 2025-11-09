@@ -138,14 +138,11 @@ const create_profile = () => {
   haptic.button_click()
   if (!validate_profile() || profile.value == undefined) return
 
-  const invitation = window.location.hash.slice(1)
-
   const new_profile: VCreateProfile = {
     name: profile.value.name,
     birth_date: profile.value.birth_date,
     avatar: profile.value.avatar,
     university: profile.value.university,
-    invitation: invitation,
   }
   ApiService.profile
     .create_profile(new_profile)

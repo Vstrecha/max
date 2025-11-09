@@ -24,14 +24,8 @@ export const useAppStore = defineStore('App', {
       this.show_app = true
       router.push({ name: 'friend_request', params: { invitation } })
     },
-    openAnonymousMode() {
-      router.push({ name: 'welcome' }).then(() => {
-        this.show_app = true
-        this.isFullscreen = true
-      })
-    },
-    openInvitationMode(invitation: string) {
-      router.push({ name: 'welcome', params: { invitation } }).then(() => (this.show_app = true))
+    openRegistrationMode() {
+      router.push({ name: 'welcome' }).then(() => (this.show_app = true))
       this.isFullscreen = true
     },
     endRegistrationMode() {

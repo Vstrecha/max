@@ -2,78 +2,25 @@
 import AvatarImage from '@/components/utility/AvatarImage.vue'
 import TextInput from '@/components/utility/TextInput.vue'
 import { ApiService } from '@/controllers/api'
-import { getLandingPreview, haptic } from '@/controllers/max'
+import { haptic } from '@/controllers/max'
 import { notify } from '@/controllers/notifications'
 import { useAppStore } from '@/stores/appStore'
 import { useUserStore } from '@/stores/userStore'
 import { VNotificationType } from '@/types/Notification'
-import type { VProfile, VCreateProfile } from '@/types/Profile'
+import { type VCreateProfile, VProfileSchema, VProfileSkeleton } from '@/types/Profile'
 import { VFileType } from '@/types/Files'
 import { Button, Row, Col } from 'vant'
-import { computed, ref, watch } from 'vue'
-
-const props = defineProps<{
-  invitation?: string
-}>()
+import { ref } from 'vue'
+import * as v from 'valibot'
 
 const app_state = useAppStore()
 const user_state = useUserStore()
 
-const invitationCode = computed(() => props.invitation ?? '')
-const referrer = ref<VProfile | undefined>()
-const isReferrerLoading = ref(false)
-const placeholderReferrer = getLandingPreview()
-
-const profileForm = ref({
-  name: '',
-  birth_date: '',
-  university: '',
-  avatar: undefined as string | undefined,
-  avatar_url: undefined as string | undefined,
-})
+const profileForm = ref(VProfileSkeleton())
 
 const fileInput = ref<HTMLInputElement | null>(null)
 const isUploadingAvatar = ref(false)
 const isSubmitting = ref(false)
-
-const canSubmit = computed(() => {
-  return (
-    invitationCode.value.trim().length > 0 &&
-    profileForm.value.name.trim().length > 0 &&
-    profileForm.value.birth_date.trim().length > 0 &&
-    profileForm.value.university.trim().length > 0 &&
-    !isSubmitting.value &&
-    !isUploadingAvatar.value
-  )
-})
-
-const displayName = computed(() => referrer.value?.name ?? placeholderReferrer.name)
-const displayAvatar = computed(() => referrer.value?.avatar_url ?? placeholderReferrer.avatar_url)
-
-watch(
-  () => invitationCode.value,
-  () => {
-    if (!invitationCode.value) {
-      referrer.value = undefined
-      return
-    }
-    loadReferrer()
-  },
-  { immediate: true },
-)
-
-async function loadReferrer() {
-  if (!invitationCode.value) return
-  isReferrerLoading.value = true
-  try {
-    referrer.value = await ApiService.friends.check_invitation(invitationCode.value)
-  } catch (error) {
-    referrer.value = undefined
-    notify(VNotificationType.ERROR, `Не получилось найти приглашение. \n ${error}`)
-  } finally {
-    isReferrerLoading.value = false
-  }
-}
 
 const openFilePicker = () => {
   haptic.button_click()
@@ -101,14 +48,23 @@ const onAvatarSelected = async (event: Event) => {
   }
 }
 
+const validate_profile = (): boolean => {
+  const validation = v.safeParse(VProfileSchema, profileForm.value)
+  if (!validation.success) {
+    let error_message = ''
+    validation.issues.forEach((error) => {
+      error_message += error.message + '\n'
+    })
+    notify(VNotificationType.WARNING, `Неккоректно заполнены поля: \n ${error_message}`)
+    return false
+  }
+  return true
+}
+
 const submitProfile = async () => {
   haptic.button_click()
-  if (!invitationCode.value) {
-    notify(VNotificationType.WARNING, 'Для регистрации нужна ссылка-приглашение.')
-    return
-  }
-  if (!canSubmit.value) {
-    notify(VNotificationType.WARNING, 'Заполни все поля, чтобы продолжить.')
+
+  if (!validate_profile()) {
     return
   }
 
@@ -116,8 +72,7 @@ const submitProfile = async () => {
     name: profileForm.value.name.trim(),
     birth_date: profileForm.value.birth_date,
     university: profileForm.value.university.trim(),
-    avatar: profileForm.value.avatar,
-    invitation: invitationCode.value,
+    avatar: profileForm.value.avatar
   }
 
   isSubmitting.value = true
@@ -147,20 +102,6 @@ const submitProfile = async () => {
         </Row>
 
         <div class="intro">
-          <div class="referrer" v-if="displayName">
-            <AvatarImage
-              width="120px"
-              height="120px"
-              border-weight="3"
-              :avatar_url="displayAvatar"
-              :signature="displayName"
-            />
-            <h2 class="referrer_name" v-if="!isReferrerLoading">{{ displayName }}</h2>
-            <span class="referrer_caption" v-if="invitationCode">
-              Уже во Встрече! и ждёт тебя
-            </span>
-          </div>
-
           <p class="product_description">
             На «Встречу!» студенты находят интересные события и собираются вместе офлайн.
             Подключайся, чтобы не пропускать тусовки своего университета и знакомиться с новыми
@@ -195,7 +136,7 @@ const submitProfile = async () => {
 
           <TextInput
             class="info_field"
-            title="Имя и фамилия"
+            title="Имя"
             v-model="profileForm.name"
             :editing="true"
             required
@@ -223,7 +164,6 @@ const submitProfile = async () => {
               type="primary"
               size="large"
               :loading="isSubmitting"
-              :disabled="!canSubmit"
               @click="submitProfile"
             >
               Зарегистрироваться
