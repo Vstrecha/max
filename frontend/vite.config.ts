@@ -11,7 +11,7 @@ export default defineConfig(() => {
   return {
     plugins: [morganPlugin(), vue(), vueDevTools()],
     server: {
-      allowedHosts: ['horseshoe-crab.ru', 'localhost', 'host.docker.internal'],
+      allowedHosts: ['horseshoe-crab.ru', 'localhost', 'max-total.ru'],
     },
     resolve: {
       alias: {

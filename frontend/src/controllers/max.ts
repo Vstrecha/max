@@ -11,6 +11,7 @@ type LandingPreview = {
 }
 
 function init_app() {
+  debugger
   tg_state.initDataRaw = app.initData
   tg_state.startParam = app.initDataUnsafe.start_param
 
