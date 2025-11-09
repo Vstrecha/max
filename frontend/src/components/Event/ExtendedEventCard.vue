@@ -4,7 +4,7 @@ import { type VExtendedEvent } from '@/types/Event'
 import IconedTextField from '@/components/utility/IconedTextField.vue'
 
 import { MapPin, CalendarClock, Users, RussianRuble, LockOpen, Repeat2 } from 'lucide-vue-next'
-import { Button, Image as VanImage, Popup, Row } from 'vant'
+import { Button, Image as VanImage, Popup } from 'vant'
 import { toRef } from 'vue'
 import { haptic } from '@/controllers/max'
 

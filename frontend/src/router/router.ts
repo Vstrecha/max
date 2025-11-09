@@ -5,7 +5,6 @@ import FriendRequest from '@/components/utility/FriendRequest.vue'
 import HomeView from '@/views/HomeView.vue'
 import EventsView from '@/views/EventsView.vue'
 import EventView from '@/views/EventView.vue'
-import MessageBoardView from '@/views/MessageBoardView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import { backButton } from '@/controllers/max'
 import FriendsView from '@/views/FriendsView.vue'
@@ -19,12 +18,9 @@ const routes = [
     component: WelcomeView,
   },
   {
-    path: '/qr',
+    path: '/qr/:qr_code/:description',
     name: 'qr_code',
-    props: (route) => ({
-      text: route.query.text,
-      description: route.query.description,
-    }),
+    props: true,
     component: QRCodeView,
     meta: { isPopup: true },
   },
@@ -60,12 +56,6 @@ const routes = [
     component: EventView,
     props: true,
     meta: { isPopup: true },
-  },
-  {
-    path: '/message_board/',
-    name: 'message_board',
-    component: MessageBoardView,
-    props: true,
   },
   {
     path: '/profile/my',

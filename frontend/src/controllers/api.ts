@@ -218,10 +218,6 @@ function generate_request_id(): string {
   return uuidv4()
 }
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 // response: AxiosResponse<unknown, unknown>,
 function parse_response<const TSchema extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>>(
   schema: TSchema,
