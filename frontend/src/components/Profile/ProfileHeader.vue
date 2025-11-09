@@ -19,7 +19,7 @@
       <AvatarImage
         width="170px"
         height="170px"
-        :signature="profile.name"
+        :signature="get_name"
         :avatar_url="profile.avatar_url"
       />
       <div class="photo_edit" v-if="isEditing" @click="upload_photo">
@@ -47,6 +47,7 @@ import { computed, useTemplateRef } from 'vue'
 import { VFileType } from '@/types/Files'
 import { notify } from '@/controllers/notifications'
 import { VNotificationType } from '@/types/Notification'
+import { useProfileActions } from '@/composables/useProfileActions'
 
 const profile = defineModel<VProfile>({ required: true })
 const states = defineProps<{
@@ -59,15 +60,16 @@ const emit = defineEmits<{
   (e: 'save_changes'): void
 }>()
 
+const { get_name } = useProfileActions(profile)
+
 const upload_photo_input = useTemplateRef('upload_photo_input')
 
 const get_header = computed(() => {
   if (states.isCreating) return 'Новый профиль'
   else if (states.isEditing) return 'Редактирование'
-  else return full_name
+  else return get_name
 })
 
-const full_name = computed(() => profile.value.name)
 
 const upload_photo = function () {
   haptic.button_click()

@@ -4,14 +4,16 @@ const tg_state = {
   initDataRaw: undefined as string | undefined,
   startParam: undefined as string | undefined,
 
-  user_name: undefined as string | undefined,
+  user_first_name: undefined as string | undefined,
+  user_last_name: undefined as string | undefined,
 }
 
 
 function init_app() {
   tg_state.initDataRaw = app.initData
   tg_state.startParam = app.initDataUnsafe.start_param
-  tg_state.user_name = app.initDataUnsafe.user.first_name + app.initDataUnsafe.user.last_name
+  tg_state.user_first_name = app.initDataUnsafe.user.first_name 
+  tg_state.user_last_name = app.initDataUnsafe.user.last_name
 
   const platform = app.platform
   console.log(platform)

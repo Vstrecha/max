@@ -1,23 +1,14 @@
 <template>
   <div class="information">
-    <TextInput class="info_field" title="Имя" v-model="profile.name" :editing="isEditing" required />
+    <TextInput class="info_field" title="Имя" v-model="profile.first_name" :editing="true" required />
 
-    <TextInput
-      class="info_field"
-      title="Дата рождения"
-      v-model="profile.birth_date"
-      :editing="isEditing"
-      required
-      input_type="date"
-    />
+    <TextInput class="info_field" title="Фамилия" v-model="profile.last_name" :editing="true" required />
 
-    <TextInput
-      class="info_field"
-      title="ВУЗ"
-      v-model="profile.university"
-      :editing="isEditing"
-      required
-    />
+    <TextInput class="info_field" title="Пол" v-model="profile.gender" :editing="true" input_type="gender" required />
+    <TextInput class="info_field" title="Дата рождения" v-model="profile.birth_date" :editing="isEditing" required
+      input_type="date" />
+
+    <TextInput class="info_field" title="ВУЗ" v-model="profile.university" :editing="isEditing" required />
 
     <div v-if="!isEditing">
       <TextInput class="info_field" title="Возраст" v-model="get_full_age" :editing="isEditing" />
@@ -26,35 +17,23 @@
         <div class="friends">
           <span class="friends_title">Друзья</span>
           <div class="friends_list">
-            <AvatarImage
-              class="friend_avatar"
-              v-for="friend in friends?.slice(0, 4)"
-              :key="friend.id"
-              :avatar_url="friend.avatar_url"
-              :signature="friend.name"
-              width="27px"
-              height="27px"
-              border-weight="1"
-              friend
-            />
+            <AvatarImage class="friend_avatar" v-for="friend in friends?.slice(0, 4)" :key="friend.id"
+              :avatar_url="friend.avatar_url" :signature="friend.first_name" width="27px" height="27px"
+              border-weight="1" friend />
             <span class="friends_total"> ({{ friends?.length ?? 0 }}) </span>
           </div>
         </div>
 
-        <img
-          class="friends_extend_button"
-          src="@/assets/icons/extend-list-button.svg"
-          alt="Открыть"
-        />
+        <img class="friends_extend_button" src="@/assets/icons/extend-list-button.svg" alt="Открыть" />
       </div>
     </div>
   </div>
 
   <Row justify="center" v-if="isCreating">
     <Col span="12">
-      <div class="create_button_wrap">
-        <Button type="primary" @click="send_create_profile">На Встречу!</Button>
-      </div>
+    <div class="create_button_wrap">
+      <Button type="primary" @click="send_create_profile">На Встречу!</Button>
+    </div>
     </Col>
   </Row>
 </template>
@@ -97,6 +76,7 @@ const show_friends = () => {
   margin-top: 10px;
   padding: 0 48px;
 }
+
 .info_field {
   margin-bottom: 25px;
 }
@@ -114,14 +94,17 @@ const show_friends = () => {
   justify-content: space-between;
   align-items: center;
 }
+
 .friends_wrap:hover {
   cursor: pointer;
 }
+
 .friends_title {
   color: var(--var-secondary-emph-color);
   font-weight: 600;
   font-size: 20px;
 }
+
 .friends_list {
   margin-top: 13px;
   display: flex;
@@ -135,6 +118,7 @@ const show_friends = () => {
   position: relative;
   margin-left: -11px;
 }
+
 .friends_total {
   color: var(--var-opposite-background-color);
   font-weight: 400;

@@ -8,12 +8,14 @@ const nullable_string = v.pipe(
 
 const VProfileSchema = v.object({
   id: v.string(),
-  name: v.pipe(v.string(), v.nonEmpty('Имя не может быть пустым.')),
+  first_name: v.pipe(v.string(), v.nonEmpty('Имя не может быть пустым.')),
+  last_name: v.pipe(v.string(), v.nonEmpty('Фамилия не может быть пустой.')),
   birth_date: v.pipe(
     v.string(),
     v.isoDate('Дата должна быть в формате YYYY-MM-DD'),
     v.maxValue('2008-09-01', 'На Встречи! ходят только с 17-ти лет.'),
   ),
+  gender: v.pipe(v.string(), v.values(['M', 'F'], 'Пол должен быть выбран')),
   university: v.pipe(v.string(), v.nonEmpty('Поле ВУЗ не может быть пустым.')),
   avatar: nullable_string,
   avatar_url: nullable_string,
@@ -27,7 +29,9 @@ const VProfileOrUndefinedSchema = v.pipe(
 type VProfileOrUndefined = v.InferOutput<typeof VProfileOrUndefinedSchema>
 
 type VCreateProfile = {
-  name: string
+  first_name: string
+  last_name: string
+  gender: string // 'M' | 'F'
   birth_date: string
   avatar: string | undefined
   university: string
@@ -35,8 +39,10 @@ type VCreateProfile = {
 
 const VProfileSkeleton = (): VProfile => ({
   id: '',
-  name: '',
+  first_name: '',
+  last_name: '',
   birth_date: '',
+  gender: 'M',
   avatar: undefined,
   avatar_url: undefined,
   university: '',

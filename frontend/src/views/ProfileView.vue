@@ -139,7 +139,9 @@ const create_profile = () => {
   if (!validate_profile() || profile.value == undefined) return
 
   const new_profile: VCreateProfile = {
-    name: profile.value.name,
+    first_name: profile.value.first_name,
+    last_name: profile.value.last_name,
+    gender: profile.value.gender,
     birth_date: profile.value.birth_date,
     avatar: profile.value.avatar,
     university: profile.value.university,
@@ -148,7 +150,7 @@ const create_profile = () => {
     .create_profile(new_profile)
     .then((created_profile) => {
       user_state.profile = created_profile
-      notify(VNotificationType.SUCCESS, `${created_profile.name}, твой профиль создан!`)
+      notify(VNotificationType.SUCCESS, `${created_profile.first_name}, твой профиль создан!`)
       app_state.endRegistrationMode()
     })
     .catch((error) => {
