@@ -7,6 +7,7 @@ from app.core.config import ALL_TAGS
 from app.db.crud import events as crud_events
 from app.db.crud import profiles as crud_profiles
 from app.db.crud import qr_scans as crud_qr_scans
+from app.db.models.event import Event as EventModel
 from app.db.models.event import EventParticipation
 from app.db.session import get_db
 from app.schemas.events import (
@@ -19,6 +20,32 @@ from app.schemas.events import (
 from app.schemas.qr_scans import QRScanCreate, QRScanResponse
 
 router = APIRouter()
+
+
+def _serialize_event(event_model: EventModel) -> Event:
+    """Convert ORM event model to Pydantic schema."""
+    return Event.model_validate(event_model, from_attributes=True)
+
+
+def _serialize_event_with_participation(
+    *,
+    db: Session,
+    event_model: EventModel,
+    user_id: str,
+) -> EventWithParticipation:
+    """Convert ORM event model to response with participation info."""
+    return EventWithParticipation(
+        event=_serialize_event(event_model),
+        friends_going=crud_events.event.get_friends_going_count(
+            db, event_id=event_model.id, user_id=user_id
+        ),
+        friends_of_friends_going=crud_events.event.get_friends_of_friends_going_count(
+            db, event_id=event_model.id, user_id=user_id
+        ),
+        participation_type=crud_events.event.get_user_participation_type(
+            db, event_id=event_model.id, user_id=user_id
+        ),
+    )
 
 
 @router.get(
@@ -63,43 +90,10 @@ def get_global_events(
     )
 
     # Convert to EventWithParticipation format
-    events_with_participation = []
-    for event in events:
-        # Create event dict with is_registration_available
-        event_dict = {
-            "id": event.id,
-            "title": event.title,
-            "body": event.body,
-            "photo": event.photo,
-            "photo_url": event.photo_url,
-            "tags": event.tags or [],
-            "place": event.place,
-            "start_date": event.start_date,
-            "end_date": event.end_date,
-            "max_participants": event.max_participants,
-            "registration_start_date": event.registration_start_date,
-            "registration_end_date": event.registration_end_date,
-            "status": event.status,
-            "creator": event.creator,
-            "participants": event.participants_count,
-            "is_registration_available": event.is_registration_available,
-            "created_at": event.created_at,
-            "updated_at": event.updated_at,
-        }
-        event_obj = Event(**event_dict)
-        event_data = EventWithParticipation(
-            event=event_obj,
-            friends_going=crud_events.event.get_friends_going_count(
-                db, event_id=event.id, user_id=user.id
-            ),
-            friends_of_friends_going=crud_events.event.get_friends_of_friends_going_count(
-                db, event_id=event.id, user_id=user.id
-            ),
-            participation_type=crud_events.event.get_user_participation_type(
-                db, event_id=event.id, user_id=user.id
-            ),
-        )
-        events_with_participation.append(event_data)
+    events_with_participation = [
+        _serialize_event_with_participation(db=db, event_model=event, user_id=user.id)
+        for event in events
+    ]
 
     return EventListResponse(events=events_with_participation, total=total, has_more=has_more)
 
@@ -129,39 +123,7 @@ def get_event_detail(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
 
     # Create event dict with is_registration_available
-    event_dict = {
-        "id": event.id,
-        "title": event.title,
-        "body": event.body,
-        "photo": event.photo,
-        "photo_url": event.photo_url,
-        "tags": event.tags or [],
-        "place": event.place,
-        "start_date": event.start_date,
-        "end_date": event.end_date,
-        "max_participants": event.max_participants,
-        "registration_start_date": event.registration_start_date,
-        "registration_end_date": event.registration_end_date,
-        "status": event.status,
-        "creator": event.creator,
-        "participants": event.participants_count,
-        "is_registration_available": event.is_registration_available,
-        "created_at": event.created_at,
-        "updated_at": event.updated_at,
-    }
-    event_obj = Event(**event_dict)
-    event_data = EventWithParticipation(
-        event=event_obj,
-        friends_going=crud_events.event.get_friends_going_count(
-            db, event_id=event_id, user_id=user.id
-        ),
-        friends_of_friends_going=crud_events.event.get_friends_of_friends_going_count(
-            db, event_id=event_id, user_id=user.id
-        ),
-        participation_type=crud_events.event.get_user_participation_type(
-            db, event_id=event_id, user_id=user.id
-        ),
-    )
+    event_data = _serialize_event_with_participation(db=db, event_model=event, user_id=user.id)
 
     return event_data
 
@@ -299,27 +261,7 @@ def participate_in_event(
     )
 
     # Return event with is_registration_available
-    event_dict = {
-        "id": event.id,
-        "title": event.title,
-        "body": event.body,
-        "photo": event.photo,
-        "photo_url": event.photo_url,
-        "tags": event.tags or [],
-        "place": event.place,
-        "start_date": event.start_date,
-        "end_date": event.end_date,
-        "max_participants": event.max_participants,
-        "registration_start_date": event.registration_start_date,
-        "registration_end_date": event.registration_end_date,
-        "status": event.status,
-        "creator": event.creator,
-        "participants": event.participants_count,
-        "is_registration_available": event.is_registration_available,
-        "created_at": event.created_at,
-        "updated_at": event.updated_at,
-    }
-    return Event(**event_dict)
+    return _serialize_event(event)
 
 
 @router.delete("/user_events/{event_id}", summary="Leave an event")
@@ -428,43 +370,10 @@ def get_user_events(
         events = events[:-1]
 
     # Convert to EventWithParticipation format
-    events_with_participation = []
-    for event in events:
-        # Create event dict with is_registration_available
-        event_dict = {
-            "id": event.id,
-            "title": event.title,
-            "body": event.body,
-            "photo": event.photo,
-            "photo_url": event.photo_url,
-            "tags": event.tags or [],
-            "place": event.place,
-            "start_date": event.start_date,
-            "end_date": event.end_date,
-            "max_participants": event.max_participants,
-            "registration_start_date": event.registration_start_date,
-            "registration_end_date": event.registration_end_date,
-            "status": event.status,
-            "creator": event.creator,
-            "participants": event.participants_count,
-            "is_registration_available": event.is_registration_available,
-            "created_at": event.created_at,
-            "updated_at": event.updated_at,
-        }
-        event_obj = Event(**event_dict)
-        event_data = EventWithParticipation(
-            event=event_obj,
-            friends_going=crud_events.event.get_friends_going_count(
-                db, event_id=event.id, user_id=user.id
-            ),
-            friends_of_friends_going=crud_events.event.get_friends_of_friends_going_count(
-                db, event_id=event.id, user_id=user.id
-            ),
-            participation_type=crud_events.event.get_user_participation_type(
-                db, event_id=event.id, user_id=user.id
-            ),
-        )
-        events_with_participation.append(event_data)
+    events_with_participation = [
+        _serialize_event_with_participation(db=db, event_model=event, user_id=user.id)
+        for event in events
+    ]
 
     return EventListResponse(events=events_with_participation, total=total, has_more=has_more)
 

@@ -17,8 +17,8 @@ const {
   is_viewer,
   get_formatted_date,
   get_tags,
-  invite,
   open_extended_card,
+  open_qr,
 } = useEventActions(toRef(props, 'extended_event'))
 
 const event = props.extended_event.event
@@ -51,7 +51,7 @@ const event = props.extended_event.event
       </div>
     </div>
     <div v-if="!is_viewer" class="event_buttons_wrap">
-      <div class="event_button" @click.stop="invite"><span>Поделиться</span></div>
+      <div class="event_button" @click.stop="open_qr"><span>Открыть QR-код</span></div>
     </div>
   </div>
 </template>

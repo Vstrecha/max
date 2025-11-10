@@ -57,8 +57,8 @@ class Event(Base):
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
     max_participants = Column(Integer, nullable=True)
-    registration_start_date = Column(Date, nullable=True)
-    registration_end_date = Column(Date, nullable=True)
+    registration_start_date = Column(DateTime, nullable=True)
+    registration_end_date = Column(DateTime, nullable=True)
     creator = Column(String, ForeignKey("profiles.id"), nullable=False)
     status = Column(String(1), nullable=False, default="A")  # A: ACTIVE, E: ENDED
     created_at = Column(DateTime, server_default=func.now())
@@ -89,14 +89,14 @@ class Event(Base):
     @property
     def is_registration_available(self) -> bool:
         """Check if registration is currently available."""
-        from datetime import date
+        from datetime import datetime
 
-        today = date.today()
+        now = datetime.now()
 
         # Check registration dates
-        if self.registration_start_date and today < self.registration_start_date:
+        if self.registration_start_date and now < self.registration_start_date:
             return False
-        if self.registration_end_date and today > self.registration_end_date:
+        if self.registration_end_date and now > self.registration_end_date:
             return False
 
         # Check max participants

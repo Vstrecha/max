@@ -26,7 +26,9 @@ const {
   is_creator,
   is_viewer,
   get_tags,
-  invite,
+  can_register,
+  registrationBlockReason,
+  open_extended_card,
   open_qr,
 } = useEventActions(toRef(props, 'extended_event'))
 
@@ -86,7 +88,14 @@ const edit_event = () => {
 
     <div class="event_buttons">
       <div v-if="is_viewer">
-        <Button @click="select_event" text="Хочу пойти!" />
+        <Button
+          @click="select_event"
+          :text="can_register ? 'Хочу пойти!' : 'Регистрация недоступна'"
+          :disabled="!can_register"
+        />
+        <p v-if="!can_register && registrationBlockReason" class="event_registration_hint">
+          {{ registrationBlockReason }}
+        </p>
       </div>
 
       <div v-else class="event_buttons_group">
@@ -106,8 +115,6 @@ const edit_event = () => {
             @click="deselect_event"
             text="Не смогу пойти"
           />
-          <div style="width: 10px; display: inline-block"></div>
-          <Button class="event_buttons_group_small" @click="invite" text="Поделиться" />
         </div>
       </div>
     </div>
@@ -212,5 +219,12 @@ const edit_event = () => {
   font-size: 14px;
   color: var(--var-opposite-background-color);
   margin-bottom: 27px;
+}
+.extended-event-card .event_registration_hint {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--var-opposite-background-color);
 }
 </style>

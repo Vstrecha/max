@@ -16,12 +16,28 @@ import { useAppStore } from '@/stores/appStore'
 import ExtendedEventCard from '@/components/Event/ExtendedEventCard.vue'
 import EditingEventCard from '@/components/Event/EditingEventCard.vue'
 import { ApiService } from '@/controllers/api'
+import { getRegistrationState, normalizeDateTimeForApi } from '@/utils/eventRegistration'
 
 const app_state = useAppStore()
 const props = defineProps<{
   event_id: string
 }>()
 const event = ref<VExtendedEvent | undefined>()
+
+const sanitizeEvent = (target: VEvent): VEvent => {
+  const sanitized = structuredClone(target) as VEvent
+
+  sanitized.max_participants =
+    sanitized.max_participants && !Number.isNaN(Number(sanitized.max_participants))
+      ? Math.max(1, Math.floor(Number(sanitized.max_participants)))
+      : undefined
+
+  sanitized.registration_start_date = normalizeDateTimeForApi(sanitized.registration_start_date)
+  sanitized.registration_end_date = normalizeDateTimeForApi(sanitized.registration_end_date)
+  sanitized.is_registration_available = getRegistrationState(sanitized).isAvailable
+
+  return sanitized
+}
 
 function init() {
   isCreating.value = false
@@ -59,6 +75,12 @@ const cancel_editing = () => {
 
 const select_event = () => {
   if (!event.value) return
+  const registrationState = getRegistrationState(event.value.event)
+  const reason = registrationState.reason
+  if (reason) {
+    notify(VNotificationType.WARNING, reason)
+    return
+  }
 
   ApiService.events
     .select_event(event.value.event.id)
@@ -68,6 +90,8 @@ const select_event = () => {
       // :TODO: Is it the best solution?
       event.value.participation_type = ParticipationType.PARTICIPANT
       event.value.event.participants += 1
+      const updatedState = getRegistrationState(event.value.event)
+      event.value.event.is_registration_available = updatedState.isAvailable
     })
     .catch((error) => notify(VNotificationType.ERROR, `Не смогли добавить. \n ${error}`))
 }
@@ -81,20 +105,23 @@ const deselect_event = () => {
       if (!event.value) return
       // :TODO: Is it the best solution?
       event.value.participation_type = ParticipationType.VIEWER
-      event.value.event.participants -= 1
+      event.value.event.participants = Math.max(0, event.value.event.participants - 1)
+      const updatedState = getRegistrationState(event.value.event)
+      event.value.event.is_registration_available = updatedState.isAvailable
     })
     .catch((error) => notify(VNotificationType.ERROR, `Не смогли отменить. \n ${error}`))
 }
 
 const process_event = async (new_event: VEvent) => {
-  if (!validate_event(new_event)) return
+  const sanitized_event = sanitizeEvent(new_event)
+  if (!validate_event(sanitized_event)) return
 
   is_event_processed.value = true
 
   if (isCreating.value) {
-    await create_event(new_event)
+    await create_event(sanitized_event)
   } else {
-    await update_event(new_event)
+    await update_event(sanitized_event)
   }
   isEditing.value = false
   isCreating.value = false

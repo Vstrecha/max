@@ -50,14 +50,29 @@ const VEventSchema = v.object({
   registration_start_date: v.pipe(
     v.any(),
     v.transform((value) => (value === null ? undefined : value)), // null -> undefined
-    v.optional(v.pipe(v.string(), v.isoDate('Дата должна быть в формате YYYY-MM-DD'))),
+    v.optional(
+      v.pipe(
+        v.string(),
+        v.check((input) => !Number.isNaN(Date.parse(input)), 'Дата и время должны быть валидными.'),
+      ),
+    ),
   ),
   registration_end_date: v.pipe(
     v.any(),
     v.transform((value) => (value === null ? undefined : value)), // null -> undefined
-    v.optional(v.pipe(v.string(), v.isoDate('Дата должна быть в формате YYYY-MM-DD'))),
+    v.optional(
+      v.pipe(
+        v.string(),
+        v.check((input) => !Number.isNaN(Date.parse(input)), 'Дата и время должны быть валидными.'),
+      ),
+    ),
   ),
   status: v.enum(EventStatus),
+  is_registration_available: v.pipe(
+    v.any(),
+    v.transform((value) => (value === null ? false : value)),
+    v.boolean(),
+  ),
 })
 type VEvent = v.InferInput<typeof VEventSchema>
 
@@ -98,6 +113,7 @@ const VExtendedEventSkeleton = (): VExtendedEvent => ({
     registration_end_date: undefined,
     creator: '',
     status: 'A',
+    is_registration_available: true,
   },
   friends_going: 0,
   participation_type: 'V',

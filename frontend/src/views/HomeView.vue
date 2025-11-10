@@ -4,10 +4,8 @@ import { useUserEventsStore } from '@/stores/userEventsStore'
 import { Row, Button } from 'vant'
 import { useRoute, useRouter } from 'vue-router'
 import { haptic } from '@/controllers/max'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useUserStore } from '@/stores/userStore'
-import { notify } from '@/controllers/notifications'
-import { VNotificationType } from '@/types/Notification'
 import { useAppStore } from '@/stores/appStore'
 
 const user_events = useUserEventsStore()
@@ -21,7 +19,7 @@ const is_none_events = computed(() => user_events.is_events_over && user_events.
 if (is_none_events.value) {
   user_events.reload_events()
 }
-const is_invite_button_loading = ref(false)
+const is_moderator = computed(() => user_state.profile?.is_superuser === true)
 // :TODO: ugly solution
 const has_path_children = computed(() => route.name === 'friend_request')
 
@@ -30,15 +28,9 @@ const open_events_list = () => {
   router.push({ name: 'events' })
 }
 
-const invite_friend = async () => {
+const open_create_event = () => {
   haptic.button_click()
-  is_invite_button_loading.value = true
-  try {
-    await user_state.create_invitation()
-  } catch (error) {
-    notify(VNotificationType.ERROR, 'Не смогли получить приглашение: \n' + error)
-  }
-  is_invite_button_loading.value = false
+  router.push({ name: 'create_event' })
 }
 </script>
 
@@ -70,9 +62,9 @@ const invite_friend = async () => {
       </div>
     </section>
 
-    <div class="invite_friend_block">
-      <Button :loading="is_invite_button_loading" @click="invite_friend" type="primary">
-        Пригласить друга
+    <div v-if="is_moderator" class="create_event_block">
+      <Button @click="open_create_event" type="primary">
+        Создать событие
       </Button>
     </div>
 
@@ -134,7 +126,7 @@ const invite_friend = async () => {
   font-size: 14px;
 }
 
-.invite_friend_block {
+.create_event_block {
   display: flex;
   justify-content: center;
   align-items: center;
