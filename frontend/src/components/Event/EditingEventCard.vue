@@ -213,7 +213,7 @@ const update_event = async () => {
       </div>
 
       <div class="info_group">
-        <h4 class="info_group_title">Максимальное количество участников</h4>
+        <h4 class="info_group_title">Количество участников</h4>
         <div class="info_border_wrap">
           <div class="info_field_flex">
             <Users :size="18" color="var(--var-secondary-emph-color)" />
@@ -232,6 +232,7 @@ const update_event = async () => {
       </div>
 
       <div class="info_group">
+        <h4 class="info_group_title">Время мероприятия</h4>
         <div class="info_border_wrap">
           <div class="edit_date_group">
             <CalendarClock :size="20" color="var(--var-secondary-emph-color)" />
@@ -253,13 +254,13 @@ const update_event = async () => {
       </div>
 
       <div class="info_group">
-        <h4 class="info_group_title">Регистрация</h4>
+        <h4 class="info_group_title">Время регистрации</h4>
         <div class="info_border_wrap">
           <div class="edit_date_group">
             <CalendarClock :size="20" color="var(--var-secondary-emph-color)" />
-            <div class="registration_group">
+            <div class="edit_date_group_data_picker_wrap">
               <div class="edit_date_group_data_picker">
-                <span>Начало</span>
+                <span>Открытие</span>
                 <input
                   type="datetime-local"
                   v-model="event.registration_start_date"
@@ -268,7 +269,7 @@ const update_event = async () => {
               </div>
               <div class="edit_date_group_data_picker_line"></div>
               <div class="edit_date_group_data_picker">
-                <span>Конец</span>
+                <span>Закрытие</span>
                 <input
                   type="datetime-local"
                   v-model="event.registration_end_date"
@@ -278,13 +279,6 @@ const update_event = async () => {
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="info_group">
-        <h4 class="info_group_title">
-          Ссылка на общий чат <RequiredField font_size="18" />
-          <p class="info_group_hint">Создайте чат и приложите ссылку</p>
-        </h4>
       </div>
 
       <div class="info_group">
@@ -429,6 +423,8 @@ const update_event = async () => {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+
+  margin-left: 10px;
 }
 
 .editing-event-card .edit_date_group_data_picker {
@@ -452,13 +448,6 @@ const update_event = async () => {
   border-radius: 5px;
 }
 
-.editing-event-card .registration_group {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  margin-left: 8px;
-  gap: 10px;
-}
 
 .editing-event-card .registration_group input {
   width: 100%;

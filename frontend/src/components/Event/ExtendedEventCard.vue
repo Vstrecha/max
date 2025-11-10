@@ -3,7 +3,7 @@ import { useEventActions } from '@/composables/useEventActions'
 import { type VExtendedEvent } from '@/types/Event'
 import IconedTextField from '@/components/utility/IconedTextField.vue'
 
-import { MapPin, CalendarClock, Users } from 'lucide-vue-next'
+import { MapPin, CalendarClock, Users, LockOpenIcon } from 'lucide-vue-next'
 import { Button, Image as VanImage, Popup } from 'vant'
 import { toRef } from 'vue'
 import { haptic } from '@/controllers/max'
@@ -63,8 +63,15 @@ const edit_event = () => {
           <IconedTextField margin="8px 0" :text="get_formatted_date">
             <CalendarClock :size="25" color="var(--var-secondary-emph-color)" />
           </IconedTextField>
+
+        </div>
+        <div class="event_info_part">
           <IconedTextField margin="8px 0" :text="get_participants">
             <Users :size="25" color="var(--var-secondary-emph-color)" />
+          </IconedTextField>
+
+          <IconedTextField margin="8px 0" :text="can_register ? 'Регистрация открыта' : 'Регистрация недоступна'">
+            <LockOpenIcon :size="25" color="var(--var-secondary-emph-color)" />
           </IconedTextField>
         </div>
       </div>
@@ -76,11 +83,8 @@ const edit_event = () => {
 
     <div class="event_buttons">
       <div v-if="is_viewer">
-        <Button
-          @click="select_event"
-          :text="can_register ? 'Хочу пойти!' : 'Регистрация недоступна'"
-          :disabled="!can_register"
-        />
+        <Button @click="select_event" :text="can_register ? 'Хочу пойти!' : 'Регистрация недоступна'"
+          :disabled="!can_register" />
         <p v-if="!can_register && registrationBlockReason" class="event_registration_hint">
           {{ registrationBlockReason }}
         </p>
@@ -91,28 +95,12 @@ const edit_event = () => {
           <Button class="event_buttons_group_large" @click="open_qr" text="Открыть qr-код" />
         </div>
         <div>
-          <Button
-            v-if="is_creator"
-            class="event_buttons_group_small"
-            @click="edit_event"
-            text="Изменить"
-          />
-          <Button
-            v-else
-            class="event_buttons_group_small"
-            @click="deselect_event"
-            text="Не смогу пойти"
-          />
+          <Button v-if="is_creator" class="event_buttons_group_small" @click="edit_event" text="Изменить" />
+          <Button v-else class="event_buttons_group_small" @click="deselect_event" text="Не смогу пойти" />
         </div>
       </div>
     </div>
-    <Popup
-      v-model:show="show_select_pop_up"
-      round
-      closeable
-      position="bottom"
-      :style="{ height: '30%' }"
-    >
+    <Popup v-model:show="show_select_pop_up" round closeable position="bottom" :style="{ height: '30%' }">
       <div class="pop_up_wrap">
         <div>
           <h4 class="pop_up_text_title">До встречи!</h4>
@@ -148,9 +136,11 @@ const edit_event = () => {
   display: flex;
   justify-content: space-between;
 }
+
 .extended-event-card .event_info_part:last-child {
   margin-left: 10px;
 }
+
 .extended-event-card .event_info_part {
   min-width: 35%;
   display: flex;
@@ -164,6 +154,7 @@ const edit_event = () => {
   line-height: 20px;
   white-space: pre-wrap;
 }
+
 .extended-event-card .event_buttons {
   margin: 30px;
   margin-bottom: 0;
@@ -174,13 +165,16 @@ const edit_event = () => {
   font-size: 14px;
   --van-button-normal-padding: 10px 80px;
 }
+
 .extended-event-card .event_buttons_group {
   width: 100%;
 }
+
 .extended-event-card .event_buttons_group_large {
   width: 100%;
   margin-bottom: 10px;
 }
+
 .extended-event-card .event_buttons_group_small {
   --van-button-normal-padding: 10px 10px;
   width: calc(50% - 5px);
@@ -202,12 +196,14 @@ const edit_event = () => {
   font-size: 18px;
   color: var(--var-primary-emph-color);
 }
+
 .extended-event-card .pop_up_text {
   font-weight: 500;
   font-size: 14px;
   color: var(--var-opposite-background-color);
   margin-bottom: 27px;
 }
+
 .extended-event-card .event_registration_hint {
   margin-top: 10px;
   text-align: center;
