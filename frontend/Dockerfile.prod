@@ -2,11 +2,14 @@ FROM node:25-alpine
 
 WORKDIR /app
 
+ARG VITE_HOST_API_URL
+ENV VITE_HOST_API_URL=${VITE_HOST_API_URL}
+
 COPY package*.json ./
 RUN npm install
 COPY . .
-COPY .env .
 
+RUN echo "VITE_HOST_API_URL=${VITE_HOST_API_URL}"
 RUN npm run build
 
 CMD ["echo", "Frontend build completed. Static files are in /app/dist"]
