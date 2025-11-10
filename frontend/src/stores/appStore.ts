@@ -20,10 +20,6 @@ export const useAppStore = defineStore('App', {
     activeFriendRequest: undefined as VProfile | undefined,
   }),
   actions: {
-    openFriendRequestMode(invitation: string) {
-      this.show_app = true
-      router.push({ name: 'friend_request', params: { invitation } })
-    },
     openRegistrationMode() {
       router.push({ name: 'welcome' }).then(() => (this.show_app = true))
       this.isFullscreen = true
