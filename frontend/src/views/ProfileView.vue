@@ -20,6 +20,12 @@
           @create_profile="create_profile"
           @show_friends="open_friends_page"
         />
+
+        <div v-if="can_share_invitation" class="share_friend_block">
+          <Button type="primary" size="large" @click="share_with_friend">
+            Поделиться с другом
+          </Button>
+        </div>
       </div>
       <CentralLoader v-else />
     </section>
@@ -39,6 +45,15 @@
 .content {
   position: relative;
   z-index: 10;
+}
+.share_friend_block {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.share_friend_block .van-button {
+  width: 80%;
 }
 </style>
 
@@ -60,8 +75,9 @@ import { notify } from '@/controllers/notifications'
 import { useUserStore } from '@/stores/userStore'
 import { VNotificationType } from '@/types/Notification'
 import * as v from 'valibot'
-import { ref, watch, type Ref } from 'vue'
+import { computed, ref, watch, type Ref } from 'vue'
 import { useAppStore } from '@/stores/appStore'
+import { Button } from 'vant'
 
 const props = defineProps<{
   profile_id: string
@@ -174,6 +190,20 @@ const update_profile = () => {
 
 const open_friends_page = () => {
   if (profile.value) app_state.openFriendsList(profile.value.id)
+}
+
+const can_share_invitation = computed(
+  () =>
+    !states.value.isCreating && profile.value?.id !== undefined && profile.value.id === user_state.profile?.id,
+)
+
+const share_with_friend = async () => {
+  haptic.button_click()
+  try {
+    await user_state.create_invitation()
+  } catch (error) {
+    notify(VNotificationType.ERROR, `Не смогли получить приглашение: \n${error}`)
+  }
 }
 
 function init() {

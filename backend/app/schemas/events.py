@@ -25,8 +25,8 @@ class EventBase(BaseModelNoNulls):
     start_date: date
     end_date: date
     max_participants: Optional[int] = Field(None, ge=1)
-    registration_start_date: Optional[date] = None
-    registration_end_date: Optional[date] = None
+    registration_start_date: Optional[datetime] = None
+    registration_end_date: Optional[datetime] = None
     status: str = Field("A", pattern="^[AE]$")  # A: ACTIVE, E: ENDED
 
     @field_validator("tags")
@@ -50,8 +50,8 @@ class EventUpdate(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     max_participants: Optional[int] = Field(None, ge=1)
-    registration_start_date: Optional[date] = None
-    registration_end_date: Optional[date] = None
+    registration_start_date: Optional[datetime] = None
+    registration_end_date: Optional[datetime] = None
     status: Optional[str] = Field(None, pattern="^[AE]$")
 
     @field_validator("tags")

@@ -1,15 +1,15 @@
-import { notify } from '@/controllers/notifications'
 import { haptic } from '@/controllers/max'
 import { useAppStore } from '@/stores/appStore'
-import {
-  ParticipationType,
-  type VExtendedEvent,
-} from '@/types/Event'
-import { VNotificationType } from '@/types/Notification'
+import { ParticipationType, type VExtendedEvent } from '@/types/Event'
+import { getRegistrationState } from '@/utils/eventRegistration'
 import { computed, type Ref } from 'vue'
 
 export function useEventActions(event: Ref<VExtendedEvent>) {
   const app_state = useAppStore()
+
+  const registrationState = computed(() => getRegistrationState(event.value.event))
+  const registrationBlockReason = computed(() => registrationState.value.reason)
+
   const get_participants = computed((): string => {
     const people_count = event.value.event.participants
     let people_count_string = ''
@@ -33,15 +33,20 @@ export function useEventActions(event: Ref<VExtendedEvent>) {
       friends_count_string = 'друзей'
     }
 
-    return (
+    const base =
       `${people_count} ${people_count_string}` +
       (friends_count != 0 ? ` (${friends_count} ${friends_count_string})` : '')
-    )
-  })
 
+    if (event.value.event.max_participants) {
+      return `${base} из ${event.value.event.max_participants}`
+    }
+
+    return base
+  })
 
   const is_creator = computed(() => event.value.participation_type == ParticipationType.CREATOR)
   const is_viewer = computed(() => event.value.participation_type == ParticipationType.VIEWER)
+  const can_register = computed(() => registrationState.value.isAvailable)
 
   const get_formatted_date = computed((): string => {
     const startDate = new Date(event.value.event.start_date)
@@ -67,18 +72,6 @@ export function useEventActions(event: Ref<VExtendedEvent>) {
 
   const get_tags = computed((): string => event.value.event.tags.join(', '))
 
-  const invite = function () {
-    haptic.button_click()
-
-    notify(VNotificationType.WARNING, 'Пока недоступно')
-    return
-    // ApiService.events
-    //   .share_event(event.value.event)
-    //   .then((link) => share_url(link, 'Давай сходим на эту встречу!'))
-    //   .catch((error) =>
-    //     notify(VNotificationType.ERROR, 'Не смогли получить ссылку на это событие ' + error),
-    //   )
-  }
   const open_extended_card = function () {
     haptic.button_click()
     app_state.openExtendedEventCard(event.value, true)
@@ -90,13 +83,15 @@ export function useEventActions(event: Ref<VExtendedEvent>) {
     const qr_description = `Покажи этот QR на «${event.value.event.title}»`
     app_state.openQRCode(qr_text, qr_description)
   }
+
   return {
     get_participants,
     get_formatted_date,
     get_tags,
     is_creator,
     is_viewer,
-    invite,
+    can_register,
+    registrationBlockReason,
     open_extended_card,
     open_qr,
   }

@@ -3,17 +3,11 @@
     <div class="tabs">
       <RouterLink v-slot="{ navigate, isActive }" custom :to="{ name: 'home' }">
         <div class="tab" @click="() => go(navigate)" :class="{ 'router-link-active': isActive }">
-          <div class="tab_icon"><House :size="30" /></div>
-          <span class="tab_name">Домой</span>
+          <div class="tab_icon"><CalendarCheck2 :size="30" /></div>
+          <span class="tab_name">Мои события</span>
         </div>
       </RouterLink>
       <RouterLink v-slot="{ navigate, isActive }" custom :to="{ name: 'events' }">
-        <div class="tab" @click="() => go(navigate)" :class="{ 'router-link-active': isActive }">
-          <div class="tab_icon"><CalendarCheck2 :size="30" /></div>
-          <span class="tab_name">События</span>
-        </div>
-      </RouterLink>
-      <RouterLink v-slot="{ navigate, isActive }" custom :to="{ name: 'create_event' }">
         <div
           class="tab"
           id="add_event_tab"
@@ -23,13 +17,7 @@
           <div id="add_event_icon">
             <img src="@/assets/icons/add-event-button.svg" />
           </div>
-          <span class="tab_name">Добавить</span>
-        </div>
-      </RouterLink>
-      <RouterLink v-slot="{ navigate, isActive }" custom :to="{ name: 'message_board' }">
-        <div class="tab" @click="() => go(navigate)" :class="{ 'router-link-active': isActive }">
-          <div class="tab_icon"><Handshake :size="30" /></div>
-          <span class="tab_name">Объявления</span>
+          <span class="tab_name">Все события</span>
         </div>
       </RouterLink>
       <RouterLink v-slot="{ navigate, isActive }" custom :to="{ name: 'my_profile' }">
@@ -76,8 +64,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 20%;
-  margin: 0 2%;
+  width: 33%;
+  margin: 0;
 }
 .tab:hover {
   cursor: pointer;
@@ -100,7 +88,7 @@
 </style>
 
 <script setup lang="ts">
-import { House, CalendarCheck2, Handshake, User } from 'lucide-vue-next'
+import { CalendarCheck2, User } from 'lucide-vue-next'
 import { haptic } from '@/controllers/max'
 
 const go = function (navigate: () => void) {

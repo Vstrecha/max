@@ -19,6 +19,7 @@ const VProfileSchema = v.object({
   university: v.pipe(v.string(), v.nonEmpty('Поле ВУЗ не может быть пустым.')),
   avatar: nullable_string,
   avatar_url: nullable_string,
+  is_superuser: v.boolean(),
 })
 type VProfile = v.InferOutput<typeof VProfileSchema>
 
@@ -46,6 +47,7 @@ const VProfileSkeleton = (): VProfile => ({
   avatar: undefined,
   avatar_url: undefined,
   university: '',
+  is_superuser: false,
 })
 
 export { VProfileSchema, VProfileSkeleton, VProfileOrUndefinedSchema }

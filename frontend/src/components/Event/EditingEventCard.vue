@@ -11,12 +11,8 @@ import { VNotificationType } from '@/types/Notification'
 import { haptic } from '@/controllers/max'
 import RequiredField from '@/components/utility/RequiredField.vue'
 
-import { ref, toRaw, useTemplateRef } from 'vue'
-import {
-  MapPin,
-  CalendarClock,
-  Pencil,
-} from 'lucide-vue-next'
+import { ref, toRaw, useTemplateRef, watch } from 'vue'
+import { MapPin, CalendarClock, Pencil, Users } from 'lucide-vue-next'
 import { Button, Image as VanImage, Field, CellGroup } from 'vant'
 
 const props = defineProps<{
@@ -29,7 +25,74 @@ const emit = defineEmits<{
   (e: 'cancel'): void
   (e: 'update_event', new_event: VEvent): void
 }>()
-const event = ref(structuredClone(toRaw(props.extended_event.event)))
+type NormalizableEvent = VEvent & {
+  registration_start_date?: string
+  registration_end_date?: string
+}
+
+const pad = (value: number): string => value.toString().padStart(2, '0')
+
+const toDateTimeLocal = (value: string | undefined): string | undefined => {
+  if (!value) return undefined
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value.slice(0, 16)
+  }
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
+const normalizedEvent = (): NormalizableEvent => {
+  const cloned = structuredClone(toRaw(props.extended_event.event)) as NormalizableEvent
+  cloned.registration_start_date = toDateTimeLocal(cloned.registration_start_date)
+  cloned.registration_end_date = toDateTimeLocal(cloned.registration_end_date)
+  return cloned
+}
+
+const event = ref<NormalizableEvent>(normalizedEvent())
+
+watch(
+  () => event.value.registration_start_date,
+  (value) => {
+    if (!value || value === '') {
+      event.value.registration_start_date = undefined
+    }
+  },
+)
+
+watch(
+  () => event.value.registration_end_date,
+  (value) => {
+    if (!value || value === '') {
+      event.value.registration_end_date = undefined
+      return
+    }
+    if (event.value.registration_start_date) {
+      const start = new Date(event.value.registration_start_date)
+      const end = new Date(value)
+      if (!Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime()) && end < start) {
+        event.value.registration_start_date = value
+      }
+    }
+  },
+)
+
+watch(
+  () => props.extended_event,
+  () => {
+    event.value = normalizedEvent()
+  },
+)
+
+watch(
+  () => event.value.max_participants,
+  (value) => {
+    if (value === null || Number.isNaN(value as number)) {
+      event.value.max_participants = undefined
+    } else if (typeof value === 'number' && value < 1) {
+      event.value.max_participants = 1
+    }
+  },
+)
 
 const upload_photo_input = useTemplateRef('upload_photo_input')
 
@@ -150,6 +213,25 @@ const update_event = async () => {
       </div>
 
       <div class="info_group">
+        <h4 class="info_group_title">Максимальное количество участников</h4>
+        <div class="info_border_wrap">
+          <div class="info_field_flex">
+            <Users :size="18" color="var(--var-secondary-emph-color)" />
+            <div class="input_field_wrap info_field_input">
+              <CellGroup inset>
+                <Field
+                  v-model.number="event.max_participants"
+                  type="digit"
+                  placeholder="Без ограничения"
+                  :formatter="(value: string) => value.replace(/[^0-9]/g, '')"
+                />
+              </CellGroup>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info_group">
         <div class="info_border_wrap">
           <div class="edit_date_group">
             <CalendarClock :size="20" color="var(--var-secondary-emph-color)" />
@@ -164,6 +246,34 @@ const update_event = async () => {
               <div class="edit_date_group_data_picker">
                 <span>Конец</span>
                 <input type="date" v-model="event.end_date" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info_group">
+        <h4 class="info_group_title">Регистрация</h4>
+        <div class="info_border_wrap">
+          <div class="edit_date_group">
+            <CalendarClock :size="20" color="var(--var-secondary-emph-color)" />
+            <div class="registration_group">
+              <div class="edit_date_group_data_picker">
+                <span>Начало</span>
+                <input
+                  type="datetime-local"
+                  v-model="event.registration_start_date"
+                  :max="event.registration_end_date"
+                />
+              </div>
+              <div class="edit_date_group_data_picker_line"></div>
+              <div class="edit_date_group_data_picker">
+                <span>Конец</span>
+                <input
+                  type="datetime-local"
+                  v-model="event.registration_end_date"
+                  :min="event.registration_start_date"
+                />
               </div>
             </div>
           </div>
@@ -340,6 +450,23 @@ const update_event = async () => {
   background: var(--var-primary-emph-color);
   border: none;
   border-radius: 5px;
+}
+
+.editing-event-card .registration_group {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-left: 8px;
+  gap: 10px;
+}
+
+.editing-event-card .registration_group input {
+  width: 100%;
+  color: var(--var-opposite-background-color);
+  background: var(--var-primary-emph-color);
+  border: none;
+  border-radius: 5px;
+  padding: 4px 6px;
 }
 
 .editing-event-card .edit_date_group_data_picker_line {
