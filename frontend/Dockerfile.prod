@@ -1,6 +1,10 @@
 FROM node:25-alpine
 
 WORKDIR /app
+
+ARG API_URL
+ENV VITE_API_URL=$API_URL
+
 COPY package*.json ./
 RUN npm install
 COPY . .

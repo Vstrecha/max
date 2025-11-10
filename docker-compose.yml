@@ -30,6 +30,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
+    args:
+        API_URL: ${VITE_HOST_API_URL}
     env_file:
       - .env
     volumes:
