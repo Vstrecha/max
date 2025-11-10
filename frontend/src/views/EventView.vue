@@ -24,19 +24,12 @@ const props = defineProps<{
 }>()
 const event = ref<VExtendedEvent | undefined>()
 
-const sanitizeEvent = (target: VEvent): VEvent => {
-  const sanitized = structuredClone(target) as VEvent
+const sanitizeEvent = (target: VEvent) : VEvent => {
+  target.registration_start_date = normalizeDateTimeForApi(target.registration_start_date)
+  target.registration_end_date = normalizeDateTimeForApi(target.registration_end_date)
+  target.is_registration_available = getRegistrationState(target).isAvailable
 
-  sanitized.max_participants =
-    sanitized.max_participants && !Number.isNaN(Number(sanitized.max_participants))
-      ? Math.max(1, Math.floor(Number(sanitized.max_participants)))
-      : undefined
-
-  sanitized.registration_start_date = normalizeDateTimeForApi(sanitized.registration_start_date)
-  sanitized.registration_end_date = normalizeDateTimeForApi(sanitized.registration_end_date)
-  sanitized.is_registration_available = getRegistrationState(sanitized).isAvailable
-
-  return sanitized
+  return target
 }
 
 function init() {
