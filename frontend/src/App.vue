@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import TabBar from '@/components/TabBar.vue'
 import { useAppStore } from '@/stores/appStore'
-import { tg_state } from '@/controllers/max'
 import { useUserStore } from './stores/userStore'
 import { ApiService } from './controllers/api'
 import { onMounted, onUnmounted } from 'vue'
@@ -19,17 +18,7 @@ async function init() {
     return
   }
 
-  if (user_state.profile) {
-    try {
-      user_state.friends = await ApiService.friends.get(user_state.profile.id)
-    } catch (error) {
-      notify(VNotificationType.ERROR, `Не смогли загрузить список друзей. \n ${error}`)
-      return
-    }
-    if (tg_state.startParam != undefined) {
-      app_state.openFriendRequestMode(tg_state.startParam)
-    }
-  } else {
+  if (!user_state.profile) {
     app_state.openRegistrationMode()
   }
   app_state.show_app = true

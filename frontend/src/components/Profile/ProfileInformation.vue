@@ -16,28 +16,13 @@
     <div v-if="!isEditing">
       <TextInput class="info_field" title="Возраст" v-model="get_full_age" :editing="isEditing" />
 
-      <div class="friends_wrap" @click="show_friends">
-        <div class="friends">
-          <span class="friends_title">Друзья</span>
-          <div class="friends_list">
-            <AvatarImage class="friend_avatar" v-for="friend in friends?.slice(0, 4)" :key="friend.id"
-              :avatar_url="friend.avatar_url" :signature="friend.first_name" width="27px" height="27px"
-              border-weight="1" friend />
-            <span class="friends_total"> ({{ friends?.length ?? 0 }}) </span>
-          </div>
-        </div>
-
-        <img class="friends_extend_button" src="@/assets/icons/extend-list-button.svg" alt="Открыть" />
-      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import TextInput from '@/components/utility/TextInput.vue'
-import { haptic } from '@/controllers/max'
 import type { VProfile } from '@/types/Profile'
-import AvatarImage from '../utility/AvatarImage.vue'
 import { useProfileActions } from '@/composables/useProfileActions'
 
 defineProps<{
@@ -46,19 +31,13 @@ defineProps<{
 
   friends?: VProfile[]
 }>()
-const emit = defineEmits<{
+defineEmits<{
   (e: 'create_profile'): void
   (e: 'show_friends'): void
 }>()
 const profile = defineModel<VProfile>({ required: true })
 
 const { get_full_age } = useProfileActions(profile)
-
-
-const show_friends = () => {
-  haptic.button_click()
-  emit('show_friends')
-}
 </script>
 
 <style scoped>
