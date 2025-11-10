@@ -48,6 +48,8 @@ const goBack = () => {
 <style scoped>
 .component-section {
   position: relative;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .content {

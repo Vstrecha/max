@@ -25,6 +25,7 @@ export const useAppStore = defineStore('App', {
       router.push({ name: 'friend_request', params: { invitation } })
     },
     openRegistrationMode() {
+      this.show_app = true
       router.push({ name: 'welcome' }).then(() => (this.show_app = true))
       this.isFullscreen = true
     },
@@ -50,7 +51,6 @@ export const useAppStore = defineStore('App', {
     },
 
     openQRCode(qr_code: string, description?: string) {
-      this.isFullscreen = true
       router.push({
         name: 'qr_code',
         params: {

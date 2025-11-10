@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import EventsList from '@/components/Event/EventsList.vue'
-import { Funnel } from 'lucide-vue-next'
 import { useGlobalEventsStore } from '@/stores/globalEventsStore'
 
 const global_events = useGlobalEventsStore()
@@ -10,8 +9,7 @@ const global_events = useGlobalEventsStore()
   <section class="events_main component-section-wrap">
     <section class="component-section">
       <div class="events_header">
-        <h1 class="events_title">Выбрать Встречу!</h1>
-        <Funnel :size="20" color="var(--var-secondary-emph-color)" />
+        <h1 class="events_title">Выбрать событие!</h1>
       </div>
       <EventsList
         :events_list="global_events.events"

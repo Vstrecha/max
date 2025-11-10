@@ -25,7 +25,7 @@ const onLoad = async () => {
     await props.load_more_events()
     isLoading.value = false
   } catch (error) {
-    notify(VNotificationType.ERROR, 'Не смогли загрузить новые встречи. ' + error)
+    notify(VNotificationType.ERROR, 'Не смогли загрузить новые события. ' + error)
   }
 }
 
@@ -34,7 +34,7 @@ const onRefresh = async () => {
     await props.reload_events()
     isRefreshing.value = false
   } catch (error) {
-    notify(VNotificationType.ERROR, 'Не смогли обновить список встреч. ' + error)
+    notify(VNotificationType.ERROR, 'Не смогли обновить список событий. ' + error)
   }
 }
 
@@ -64,7 +64,7 @@ onMounted(init)
       :error="is_loading_failed"
       @load="onLoad"
       finished-text="Пока так"
-      loading-text="Загружаем следующие встречи"
+      loading-text="Загружаем следующие события"
       error-text="Ошибка"
     >
       <div class="events_wrap">

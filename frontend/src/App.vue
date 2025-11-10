@@ -12,10 +12,6 @@ const app_state = useAppStore()
 const user_state = useUserStore()
 
 async function init() {
-  if (tg_state.startParam === undefined) {
-    app_state.show_app = true
-  }
-
   try {
     user_state.profile = await ApiService.profile.my_profile()
   } catch (error) {
@@ -36,6 +32,7 @@ async function init() {
   } else {
     app_state.openRegistrationMode()
   }
+  app_state.show_app = true
 }
 const handleFocusIn = (e: FocusEvent) => {
   const target = e.target as HTMLElement

@@ -61,7 +61,7 @@ const is_event_processed = ref(false)
 const show_select_pop_up = ref(false)
 
 const get_header = computed(() => {
-  if (isCreating.value) return 'Новая встреча'
+  if (isCreating.value) return 'Новое событие'
   else if (isEditing.value) return 'Редактирование'
   else return event.value?.event.title
 })

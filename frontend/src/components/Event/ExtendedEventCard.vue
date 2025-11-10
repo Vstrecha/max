@@ -28,7 +28,6 @@ const {
   get_tags,
   can_register,
   registrationBlockReason,
-  open_extended_card,
   open_qr,
 } = useEventActions(toRef(props, 'extended_event'))
 
@@ -67,17 +66,6 @@ const edit_event = () => {
           <IconedTextField margin="8px 0" :text="get_participants">
             <Users :size="25" color="var(--var-secondary-emph-color)" />
           </IconedTextField>
-        </div>
-        <div class="event_info_part">
-          <!-- <IconedTextField margin="8px 0" :text="extended_event.event.price ?? 'Неизвестно'">
-            <RussianRuble :size="25" color="var(--var-secondary-emph-color)" />
-          </IconedTextField>
-          <IconedTextField margin="8px 0" :text="get_visability">
-            <LockOpen :size="25" color="var(--var-secondary-emph-color)" />
-          </IconedTextField>
-          <IconedTextField margin="8px 0" :text="get_repeatability">
-            <Repeat2 :size="25" color="var(--var-secondary-emph-color)" />
-          </IconedTextField> -->
         </div>
       </div>
 

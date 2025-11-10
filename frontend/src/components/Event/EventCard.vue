@@ -39,7 +39,7 @@ const event = props.extended_event.event
         <vanImage fit="cover" radius="10px" width="100px" height="100px" :src="event.photo_url" />
       </div>
       <div class="event_body_info_wrap">
-        <IconedTextField :text="event.place || ''">
+        <IconedTextField :text="event.place || 'Неизвестно'">
           <MapPin :size="17" color="var(--var-secondary-emph-color)" />
         </IconedTextField>
         <IconedTextField :text="get_formatted_date">

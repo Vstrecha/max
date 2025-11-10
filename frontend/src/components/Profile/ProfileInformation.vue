@@ -31,21 +31,12 @@
       </div>
     </div>
   </div>
-
-  <Row justify="center" v-if="isCreating">
-    <Col span="12">
-    <div class="create_button_wrap">
-      <Button type="primary" @click="send_create_profile">На Встречу!</Button>
-    </div>
-    </Col>
-  </Row>
 </template>
 
 <script setup lang="ts">
 import TextInput from '@/components/utility/TextInput.vue'
 import { haptic } from '@/controllers/max'
 import type { VProfile } from '@/types/Profile'
-import { Col, Row, Button } from 'vant'
 import AvatarImage from '../utility/AvatarImage.vue'
 import { useProfileActions } from '@/composables/useProfileActions'
 
@@ -63,10 +54,6 @@ const profile = defineModel<VProfile>({ required: true })
 
 const { get_full_age } = useProfileActions(profile)
 
-const send_create_profile = () => {
-  haptic.button_click()
-  emit('create_profile')
-}
 
 const show_friends = () => {
   haptic.button_click()
