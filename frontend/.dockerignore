@@ -9,7 +9,6 @@ dist
 .gitignore
 
 # Environment variables
-.env
 .env.local
 
 
