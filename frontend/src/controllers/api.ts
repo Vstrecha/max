@@ -24,7 +24,7 @@ const XRequestId = generate_request_id()
 const tmaToken = tg_state.initDataRaw
 
 const apiClient = axios.create({
-  baseURL: 'https://max-total.ru/api/v1',
+  baseURL: import.meta.env.VITE_HOST_API_URL,
   headers: {
     'Content-Type': 'application/json',
     'X-Request-Id': XRequestId,
