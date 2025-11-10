@@ -3,7 +3,7 @@
     <div class="tabs">
       <RouterLink v-slot="{ navigate, isActive }" custom :to="{ name: 'home' }">
         <div class="tab" @click="() => go(navigate)" :class="{ 'router-link-active': isActive }">
-          <div class="tab_icon"><CalendarCheck2 :size="30" /></div>
+          <div class="tab_icon"><Home :size="30" /></div>
           <span class="tab_name">Мои события</span>
         </div>
       </RouterLink>
@@ -88,7 +88,7 @@
 </style>
 
 <script setup lang="ts">
-import { CalendarCheck2, User } from 'lucide-vue-next'
+import { Home, User } from 'lucide-vue-next'
 import { haptic } from '@/controllers/max'
 
 const go = function (navigate: () => void) {

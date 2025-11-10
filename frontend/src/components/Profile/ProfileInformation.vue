@@ -4,11 +4,14 @@
 
     <TextInput class="info_field" title="Фамилия" v-model="profile.last_name" :editing="isEditing" required />
 
-    <TextInput class="info_field" title="Пол" v-model="profile.gender" :editing="isEditing" input_type="gender" required />
-    <TextInput class="info_field" title="Дата рождения" v-model="profile.birth_date" :editing="isEditing" required
-      input_type="date" />
-
     <TextInput class="info_field" title="ВУЗ" v-model="profile.university" :editing="isEditing" required />
+
+    <div v-if="isEditing">
+      <TextInput class="info_field" title="Пол" v-model="profile.gender" :editing="isEditing" input_type="gender"
+        required />
+      <TextInput class="info_field" title="Дата рождения" v-model="profile.birth_date" :editing="isEditing" required
+        input_type="date" />
+    </div>
 
     <div v-if="!isEditing">
       <TextInput class="info_field" title="Возраст" v-model="get_full_age" :editing="isEditing" />

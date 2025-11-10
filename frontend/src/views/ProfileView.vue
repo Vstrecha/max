@@ -33,6 +33,11 @@
 </template>
 
 <style scoped>
+
+.component-section-wrap {
+  position: relative;
+}
+
 .component-background-1 {
   position: absolute;
   top: 0;
@@ -47,9 +52,27 @@
   z-index: 10;
 }
 .share_friend_block {
-  margin-top: 24px;
   display: flex;
   justify-content: center;
+  align-items: center;
+
+  height: 12vh;
+  width: 100%;
+
+  background: #000000;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 17%, rgba(26, 26, 26, 1) 100%);
+  position: sticky;
+  bottom: 0;
+  padding-bottom: 26px;
+
+  font-weight: 600;
+  font-size: 14px;
+
+  --van-button-normal-padding: 20px 90px;
+
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+  animation-delay: 0.3s;
 }
 
 .share_friend_block .van-button {

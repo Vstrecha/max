@@ -1,11 +1,11 @@
 @import 'normalize.css';
 
 :root {
-  --var-background-color: #1a1a1a;
+  --var-background-color: #17181c;
   --var-opposite-background-color: #ffffff;
   --var-small-parts-background-color: #4d4d4d;
-  --var-primary-emph-color: #bb8cfc;
-  --var-secondary-emph-color: #c3fe4c;
+  --var-primary-emph-color: #007aff;
+  --var-secondary-emph-color: #FF8C00;
   --var-editing-color: #ffffff80;
 }
 
