@@ -20,8 +20,9 @@ async function init() {
 
   if (!user_state.profile) {
     app_state.openRegistrationMode()
+  }else {
+    app_state.show_app = true
   }
-  app_state.show_app = true
 }
 const handleFocusIn = (e: FocusEvent) => {
   const target = e.target as HTMLElement
