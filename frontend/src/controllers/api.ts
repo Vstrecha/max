@@ -22,6 +22,8 @@ import { VFileSchema, type VFile, type VFileTypeType } from '@/types/Files'
 
 const XRequestId = generate_request_id()
 const tmaToken = tg_state.initDataRaw
+const hpst = import.meta.env.VITE_HOST_API_URL
+console.log(hpst)
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_HOST_API_URL,
