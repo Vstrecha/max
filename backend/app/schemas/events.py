@@ -108,6 +108,7 @@ class EventWithParticipation(BaseModel):
     friends_going: int = 0
     friends_of_friends_going: int = 0
     participation_type: str = "V"  # Default to VIEWER
+    participate_id: Optional[str] = None  # ID of participation record if user is participating
 
     model_config = ConfigDict(from_attributes=True)
 

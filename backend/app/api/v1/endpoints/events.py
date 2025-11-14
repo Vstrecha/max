@@ -34,6 +34,13 @@ def _serialize_event_with_participation(
     user_id: str,
 ) -> EventWithParticipation:
     """Convert ORM event model to response with participation info."""
+    # Get participation in one query to optimize
+    participation = crud_events.event.get_user_participation(
+        db, event_id=event_model.id, user_id=user_id
+    )
+    participation_type = participation.participation_type if participation else "V"
+    participate_id = participation.id if participation else None
+
     return EventWithParticipation(
         event=_serialize_event(event_model),
         friends_going=crud_events.event.get_friends_going_count(
@@ -42,9 +49,8 @@ def _serialize_event_with_participation(
         friends_of_friends_going=crud_events.event.get_friends_of_friends_going_count(
             db, event_id=event_model.id, user_id=user_id
         ),
-        participation_type=crud_events.event.get_user_participation_type(
-            db, event_id=event_model.id, user_id=user_id
-        ),
+        participation_type=participation_type,
+        participate_id=participate_id,
     )
 
 
@@ -324,21 +330,21 @@ def get_user_events(
     # Get events where user is creator or participant
     from datetime import date
 
-    from sqlalchemy import and_, or_
+    from sqlalchemy import and_
 
     from app.db.models.event import Event, EventParticipation
 
+    # Query events where user is creator or has participation record
+    # Since creators automatically have participation records (type "C"),
+    # we can simplify the query to just check EventParticipation
     query = (
         db.query(Event)
-        .join(EventParticipation)
-        .filter(
-            or_(
-                Event.creator == user.id,
-                and_(
-                    EventParticipation.event_id == Event.id,
-                    EventParticipation.user_id == user.id,
-                ),
-            )
+        .join(
+            EventParticipation,
+            and_(
+                EventParticipation.event_id == Event.id,
+                EventParticipation.user_id == user.id,
+            ),
         )
         .distinct()
     )
