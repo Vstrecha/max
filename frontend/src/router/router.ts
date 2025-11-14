@@ -48,6 +48,7 @@ const routes = [
     name: 'create_event',
     component: EventView,
     props: { event_id: 'new' },
+    meta: { isPopup: true },
   },
   {
     path: '/event/:event_id',
