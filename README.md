@@ -7,7 +7,7 @@
 Замените `domain` на ваш домен, не забудьте получить сертификат
 Далее запустите Max Events одной командой
 ```
-docker run --rm -d docker pull ghcr.io/vstrecha/max:sha-8c2fc2d
+docker run --rm -d docker pull ghcr.io/vstrecha/max:latest
 ```
 
 ## Через Docker Compose (рекомендуется)
@@ -46,4 +46,5 @@ docker compose up -d --build
 - Frontend собирается во время создания образа с использованием переменной `VITE_HOST_API_URL`
 - Backend и Admin автоматически выполняют миграции при запуске
 - Supervisor управляет процессами backend, admin и nginx внутри контейнера
+
 
