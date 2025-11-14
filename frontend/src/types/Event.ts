@@ -87,12 +87,12 @@ const VExtendedEventSchema = v.object({
   friends_going: v.number(),
   participation_type: v.enum(ParticipationType),
   participation_id: v.pipe(
-   v.any(),
+    v.any(),
     v.transform((value) => (value === null ? undefined : value)), // null -> undefined
     v.optional(
-      v.string()
-  )),
-})
+      v.string(),
+    )),
+});
 type VExtendedEvent = v.InferInput<typeof VExtendedEventSchema>
 
 const VExtendedEventsRespondSchema = v.object({
