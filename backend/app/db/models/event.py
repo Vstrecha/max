@@ -56,12 +56,11 @@ class Event(Base):
     place = Column(String, nullable=True)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
-    price = Column(Integer, nullable=True)
+    max_participants = Column(Integer, nullable=True)
+    registration_start_date = Column(DateTime, nullable=True)
+    registration_end_date = Column(DateTime, nullable=True)
     creator = Column(String, ForeignKey("profiles.id"), nullable=False)
-    visability = Column(String(1), nullable=False, default="G")  # G: GLOBAL, P: PRIVATE
-    repeatability = Column(String(1), nullable=False, default="N")  # N: NONE, R: REPEATABLE
     status = Column(String(1), nullable=False, default="A")  # A: ACTIVE, E: ENDED
-    telegram_chat_link = Column(String, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
 
@@ -86,6 +85,25 @@ class Event(Base):
     def participants(self) -> int:
         """Get the count of participants from participations table."""
         return self.participants_count
+
+    @property
+    def is_registration_available(self) -> bool:
+        """Check if registration is currently available."""
+        from datetime import datetime
+
+        now = datetime.now()
+
+        # Check registration dates
+        if self.registration_start_date and now < self.registration_start_date:
+            return False
+        if self.registration_end_date and now > self.registration_end_date:
+            return False
+
+        # Check max participants
+        if self.max_participants and self.participants_count >= self.max_participants:
+            return False
+
+        return True
 
 
 class EventParticipation(Base):

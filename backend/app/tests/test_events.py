@@ -29,7 +29,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -47,8 +47,6 @@ class TestEventCRUD:
             "tags": ["Спорт", "Природа"],
             "start_date": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
             "end_date": (datetime.now() + timedelta(days=1, hours=2)).strftime("%Y-%m-%d"),
-            "visability": "G",
-            "repeatability": "N",
             "status": "A",
         }
 
@@ -62,11 +60,11 @@ class TestEventCRUD:
         event_data = create_event_response.json()
         assert event_data["title"] == "Test Event"
         assert event_data["creator"] == profile_id
-        assert event_data["visability"] == "G"
         assert "tags" in event_data
         assert isinstance(event_data["tags"], list)
         assert "participants" in event_data
         assert event_data["participants"] == 1  # Creator is automatically added as participant
+        assert "is_registration_available" in event_data
 
     def test_create_event_with_invalid_tags(self, client: TestClient, clean_db):
         """Test creating an event with invalid tags."""
@@ -83,7 +81,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -127,7 +125,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -174,7 +172,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -218,6 +216,9 @@ class TestEventCRUD:
         assert "friends_going" in retrieved_event
         assert "friends_of_friends_going" in retrieved_event
         assert "participation_type" in retrieved_event
+        assert "participate_id" in retrieved_event
+        # Creator should have participate_id since they participate
+        assert retrieved_event["participate_id"] is not None
 
     def test_update_event(self, client: TestClient, clean_db):
         """Test updating an event."""
@@ -234,7 +235,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -292,7 +293,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -351,7 +352,7 @@ class TestEventCRUD:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -416,7 +417,7 @@ class TestEventParticipation:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": creator_id,
+            "max_id": creator_id,
             "invited_by": None,
         }
         create_creator_response = client.post(
@@ -469,7 +470,7 @@ class TestEventParticipation:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": creator_id,
+            "max_id": creator_id,
             "invited_by": None,
         }
         create_creator_response = client.post(
@@ -530,7 +531,7 @@ class TestEventParticipation:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -570,6 +571,153 @@ class TestEventParticipation:
         event_data = get_event_response.json()
         # Creator should have participation type "C" (Creator)
         assert event_data["participation_type"] == "C"
+        # Creator should have participate_id since they participate
+        assert event_data["participate_id"] is not None
+        assert isinstance(event_data["participate_id"], str)
+
+    def test_get_user_participation_id_for_non_participant(self, client: TestClient, clean_db):
+        """Test that non-participants have participate_id as None."""
+        # Create valid init data for event creator
+        creator_id = 123456789
+        creator_init_data = create_test_init_data(creator_id, settings.BOT_TOKEN)
+
+        # First, create creator profile
+        creator_profile_payload = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "gender": "M",
+            "birth_date": "1995-05-15",
+            "avatar": None,
+            "university": "HSE University",
+            "bio": "Software engineer with passion for technology.",
+            "max_id": creator_id,
+            "invited_by": None,
+        }
+        create_creator_response = client.post(
+            f"{settings.API_VERSION}/profiles/",
+            json=creator_profile_payload,
+            headers={"Authorization": f"tma {creator_init_data}"},
+        )
+        assert create_creator_response.status_code == 201, create_creator_response.text
+
+        # Create an event as creator
+        event_payload = {
+            "title": "Test Event",
+            "body": "Test event description",
+            "tags": ["Спорт"],
+            "start_date": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
+            "end_date": (datetime.now() + timedelta(days=1, hours=2)).strftime("%Y-%m-%d"),
+            "visability": "G",
+            "repeatability": "N",
+            "status": "A",
+        }
+
+        create_event_response = client.post(
+            f"{settings.API_VERSION}/events/global_events/",
+            json=event_payload,
+            headers={"Authorization": f"tma {creator_init_data}"},
+        )
+        assert create_event_response.status_code == 200, create_event_response.text
+        event_id = create_event_response.json()["id"]
+
+        # Create another user who is not participating
+        viewer_id = 987654321
+        viewer_init_data = create_test_init_data(viewer_id, settings.BOT_TOKEN)
+
+        viewer_profile_payload = {
+            "first_name": "Jane",
+            "last_name": "Smith",
+            "gender": "F",
+            "birth_date": "1996-06-16",
+            "avatar": None,
+            "university": "HSE University",
+            "bio": "Another user.",
+            "max_id": viewer_id,
+            "invited_by": None,
+        }
+        create_viewer_response = client.post(
+            f"{settings.API_VERSION}/profiles/",
+            json=viewer_profile_payload,
+            headers={"Authorization": f"tma {viewer_init_data}"},
+        )
+        assert create_viewer_response.status_code == 201, create_viewer_response.text
+
+        # Get event details as non-participant
+        get_event_response = client.get(
+            f"{settings.API_VERSION}/events/global_events/{event_id}",
+            headers={"Authorization": f"tma {viewer_init_data}"},
+        )
+        assert get_event_response.status_code == 200, get_event_response.text
+
+        event_data = get_event_response.json()
+        # Non-participant should have participation type "V" (Viewer)
+        assert event_data["participation_type"] == "V"
+        # Non-participant should have participate_id as None
+        assert event_data["participate_id"] is None
+
+    def test_get_user_events_always_has_participate_id(self, client: TestClient, clean_db):
+        """Test that /user_events/ always returns events with participate_id."""
+        # Create valid init data
+        user_id = 123456789
+        init_data = create_test_init_data(user_id, settings.BOT_TOKEN)
+
+        # First, create a profile
+        profile_payload = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "gender": "M",
+            "birth_date": "1995-05-15",
+            "avatar": None,
+            "university": "HSE University",
+            "bio": "Software engineer with passion for technology.",
+            "max_id": user_id,
+            "invited_by": None,
+        }
+        create_profile_response = client.post(
+            f"{settings.API_VERSION}/profiles/",
+            json=profile_payload,
+            headers={"Authorization": f"tma {init_data}"},
+        )
+        assert create_profile_response.status_code == 201, create_profile_response.text
+
+        # Create an event as creator
+        event_payload = {
+            "title": "My Event",
+            "body": "My event description",
+            "tags": ["Спорт"],
+            "start_date": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
+            "end_date": (datetime.now() + timedelta(days=1, hours=2)).strftime("%Y-%m-%d"),
+            "status": "A",
+        }
+
+        create_event_response = client.post(
+            f"{settings.API_VERSION}/events/global_events/",
+            json=event_payload,
+            headers={"Authorization": f"tma {init_data}"},
+        )
+        assert create_event_response.status_code == 200, create_event_response.text
+
+        # Get user events - should return events where user is creator or participant
+        get_user_events_response = client.get(
+            f"{settings.API_VERSION}/events/user_events/",
+            headers={"Authorization": f"tma {init_data}"},
+        )
+        assert get_user_events_response.status_code == 200, get_user_events_response.text
+
+        events_data = get_user_events_response.json()
+        assert len(events_data["events"]) >= 1  # Should have at least the event we created
+
+        # All events in /user_events/ should have participate_id
+        # since user is creator or participant
+        for event in events_data["events"]:
+            assert "participate_id" in event
+            assert (
+                event["participate_id"] is not None
+            ), f"Event {event['event']['id']} should have participate_id in /user_events/"
+            assert isinstance(event["participate_id"], str)
+            assert "participation_type" in event
+            # Participation type should be "C" (Creator) or "P" (Participant), not "V" (Viewer)
+            assert event["participation_type"] in ["C", "P"]
 
 
 class TestEventFiltering:
@@ -590,7 +738,7 @@ class TestEventFiltering:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -608,8 +756,6 @@ class TestEventFiltering:
                 "tags": ["Спорт"],
                 "start_date": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
                 "end_date": (datetime.now() + timedelta(days=1, hours=2)).strftime("%Y-%m-%d"),
-                "visability": "G",
-                "repeatability": "N",
                 "status": "A",
             },
             {
@@ -618,8 +764,6 @@ class TestEventFiltering:
                 "tags": ["Природа"],
                 "start_date": (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d"),
                 "end_date": (datetime.now() + timedelta(days=2, hours=2)).strftime("%Y-%m-%d"),
-                "visability": "P",
-                "repeatability": "R",
                 "status": "A",
             },
         ]
@@ -632,16 +776,26 @@ class TestEventFiltering:
             )
             assert create_event_response.status_code == 200, create_event_response.text
 
-        # Test getting events with visibility filter
+        # Test getting events without filter (all events)
         get_events_response = client.get(
-            f"{settings.API_VERSION}/events/global_events/?visability=G",
+            f"{settings.API_VERSION}/events/global_events/",
             headers={"Authorization": f"tma {init_data}"},
         )
         assert get_events_response.status_code == 200, get_events_response.text
 
         events_data = get_events_response.json()
-        assert len(events_data["events"]) >= 1
-        assert all(event["event"]["visability"] == "G" for event in events_data["events"])
+        assert len(events_data["events"]) >= 2  # Both events should be returned
+        # Check that events have tags
+        assert all("tags" in event["event"] for event in events_data["events"])
+        # Check that events have participation info including participate_id
+        profile_id = create_profile_response.json()["id"]
+        for event in events_data["events"]:
+            assert "participation_type" in event
+            assert "participate_id" in event
+            # If event is created by current user, they should have participate_id
+            if event["event"]["creator"] == profile_id:
+                assert event["participate_id"] is not None
+                assert isinstance(event["participate_id"], str)
 
     def test_get_events_with_pagination(self, client: TestClient, clean_db):
         """Test event pagination."""
@@ -658,7 +812,7 @@ class TestEventFiltering:
             "avatar": None,
             "university": "HSE University",
             "bio": "Software engineer with passion for technology.",
-            "telegram": user_id,
+            "max_id": user_id,
             "invited_by": None,
         }
         create_profile_response = client.post(
@@ -698,3 +852,11 @@ class TestEventFiltering:
         events_data = get_events_response.json()
         assert len(events_data["events"]) <= 3
         assert events_data["has_more"] is True
+        # Check that events have participation info including participate_id
+        profile_id = create_profile_response.json()["id"]
+        for event in events_data["events"]:
+            assert "participation_type" in event
+            assert "participate_id" in event
+            # If event is created by current user, they should have participate_id
+            if event["event"]["creator"] == profile_id:
+                assert event["participate_id"] is not None

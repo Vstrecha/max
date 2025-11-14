@@ -8,6 +8,7 @@ from .file import File, FileType
 from .friends import Friends
 from .invitations import Invitations
 from .profile import Profile
+from .qr_scan import QRScan
 
 __all__ = [
     "Profile",
@@ -17,4 +18,5 @@ __all__ = [
     "Invitations",
     "Event",
     "EventParticipation",
+    "QRScan",
 ]

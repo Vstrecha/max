@@ -9,7 +9,7 @@ Tests for profile API endpoints: get, create, update, delete, and invalid get.
 from fastapi.testclient import TestClient
 
 from ..core.config import settings
-from .test_telegram_auth import create_test_init_data
+from .test_max_auth import create_test_init_data
 
 # --------------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ def test_get_profile_valid(client: TestClient, clean_db) -> None:
         "avatar": None,
         "university": "HSE University",
         "bio": "Software engineer with passion for technology.",
-        "telegram": user_id,
+        "max_id": user_id,
         "invited_by": None,
     }
     create_response = client.post(
@@ -170,7 +170,7 @@ def test_create_profile_valid(client: TestClient, clean_db) -> None:
         "avatar": None,
         "university": "ITMO University",
         "bio": "Frontend developer.",
-        "telegram": user_id,
+        "max_id": user_id,
         "invited_by": None,
     }
     response = client.post(
@@ -211,7 +211,7 @@ def test_update_profile_valid(client: TestClient, clean_db) -> None:
         "avatar": None,
         "university": "Bauman Moscow State Technical University",
         "bio": "Backend developer.",
-        "telegram": user_id,
+        "max_id": user_id,
         "invited_by": None,
     }
 
@@ -266,7 +266,7 @@ def test_delete_profile_valid(client: TestClient, clean_db) -> None:
         "avatar": None,
         "university": "Moscow Institute of Physics and Technology",
         "bio": "DevOps engineer.",
-        "telegram": user_id,
+        "max_id": user_id,
         "invited_by": None,
     }
     create_response = client.post(
@@ -354,14 +354,7 @@ def test_get_invited_profiles_valid(client: TestClient, clean_db) -> None:
     assert inviter_response.status_code == 201, inviter_response.text
     inviter_id = inviter_response.json()["id"]
 
-    # Create first invited profile with invitation from inviter
-    invitation_response_1 = client.get(
-        f"{settings.API_VERSION}/friends/new",
-        headers={"Authorization": f"tma {inviter_init_data}"},
-    )
-    assert invitation_response_1.status_code == 200, invitation_response_1.text
-    invitation_id_1 = invitation_response_1.json()["id"]
-
+    # Create first invited profile (automatic registration, no invitation needed)
     invited_payload_1 = {
         "first_name": "Invited1",
         "last_name": "User",
@@ -370,9 +363,6 @@ def test_get_invited_profiles_valid(client: TestClient, clean_db) -> None:
         "avatar": None,
         "university": "Test University",
         "bio": "Test invited user 1.",
-        "telegram": invited_user_id_1,
-        "invited_by": inviter_id,
-        "invitation": invitation_id_1,
     }
 
     response_1 = client.post(
@@ -382,15 +372,10 @@ def test_get_invited_profiles_valid(client: TestClient, clean_db) -> None:
     )
     assert response_1.status_code == 201, response_1.text
     invited_id_1 = response_1.json()["id"]
+    # With automatic registration, invited_by is None
+    assert response_1.json()["invited_by"] is None
 
-    # Create second invited profile with invitation from first invited user
-    invitation_response_2 = client.get(
-        f"{settings.API_VERSION}/friends/new",
-        headers={"Authorization": f"tma {invited_init_data_1}"},
-    )
-    assert invitation_response_2.status_code == 200, invitation_response_2.text
-    invitation_id_2 = invitation_response_2.json()["id"]
-
+    # Create second invited profile (automatic registration, no invitation needed)
     invited_payload_2 = {
         "first_name": "Invited2",
         "last_name": "User",
@@ -399,9 +384,6 @@ def test_get_invited_profiles_valid(client: TestClient, clean_db) -> None:
         "avatar": None,
         "university": "Test University",
         "bio": "Test invited user 2.",
-        "telegram": invited_user_id_2,
-        "invited_by": invited_id_1,
-        "invitation": invitation_id_2,
     }
 
     response_2 = client.post(
@@ -411,26 +393,30 @@ def test_get_invited_profiles_valid(client: TestClient, clean_db) -> None:
     )
     assert response_2.status_code == 201, response_2.text
     invited_id_2 = response_2.json()["id"]
+    # With automatic registration, invited_by is None
+    assert response_2.json()["invited_by"] is None
 
     # Test getting invited profiles for inviter
+    # Since registration is now automatic, no profiles are invited by default
     resp = client.get(
         f"{settings.API_VERSION}/profiles/{inviter_id}/invited",
         headers={"Authorization": f"tma {inviter_init_data}"},
     )
     assert resp.status_code == 200
     invited_profiles = resp.json()
-    assert len(invited_profiles) == 1  # Only first invited user
-    assert invited_profiles[0]["id"] == invited_id_1
+    # With automatic registration, no profiles are invited
+    assert len(invited_profiles) == 0
 
     # Test getting invited profiles for first invited user
+    # With automatic registration, no profiles are invited
     resp = client.get(
         f"{settings.API_VERSION}/profiles/{invited_id_1}/invited",
         headers={"Authorization": f"tma {invited_init_data_1}"},
     )
     assert resp.status_code == 200
     invited_profiles_2 = resp.json()
-    assert len(invited_profiles_2) == 1  # Only second invited user
-    assert invited_profiles_2[0]["id"] == invited_id_2
+    # With automatic registration, no profiles are invited
+    assert len(invited_profiles_2) == 0
 
     # Test pagination for invited profiles
     resp_paginated = client.get(
@@ -487,7 +473,7 @@ def test_get_my_profile_valid(client: TestClient, clean_db) -> None:
         "avatar": None,
         "university": "HSE University",
         "bio": "Software engineer with passion for technology.",
-        "telegram": user_id,
+        "max_id": user_id,
         "invited_by": None,
     }
     create_response = client.post(
@@ -506,7 +492,7 @@ def test_get_my_profile_valid(client: TestClient, clean_db) -> None:
     data = response.json()
     assert data["first_name"] == payload["first_name"]
     assert data["last_name"] == payload["last_name"]
-    assert data["telegram"] == user_id
+    assert data["max_id"] == user_id
 
     # Clean up
     profile_id = data["id"]
@@ -564,7 +550,7 @@ def test_patch_profile_valid(client: TestClient, clean_db) -> None:
         "avatar": None,
         "university": "Bauman Moscow State Technical University",
         "bio": "Backend developer.",
-        "telegram": user_id,
+        "max_id": user_id,
         "invited_by": None,
     }
 
@@ -594,7 +580,7 @@ def test_patch_profile_valid(client: TestClient, clean_db) -> None:
     assert patched_data["avatar"] == patch_payload["avatar"]
     # Check that other fields remain unchanged
     assert patched_data["first_name"] == payload["first_name"]
-    assert patched_data["telegram"] == user_id
+    assert patched_data["max_id"] == user_id
 
     # Clean up
     resp = client.delete(

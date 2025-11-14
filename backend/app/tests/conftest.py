@@ -115,7 +115,7 @@ def create_test_init_data(user_id: int = 123456789, bot_token: str = "test_token
     Create test init data for testing purposes.
 
     Args:
-        user_id: Telegram user ID
+        user_id: Max user ID
         bot_token: Bot token for signing
 
     Returns:

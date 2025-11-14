@@ -8,7 +8,7 @@ from uuid import uuid4
 
 # Example event data
 event_example = {
-    "title": "Встреча в парке",
+    "title": "Мероприятие в парке",
     "body": "Приглашаю всех на прогулку в парке Горького! Будем гулять, общаться и веселиться.",
     "photo": "file_uuid_here",
     "tags": ["Природа", "Спорт"],
@@ -24,7 +24,7 @@ event_example = {
 
 # Example event update data
 event_update_example = {
-    "title": "Обновленная встреча в парке",
+    "title": "Обновленное мероприятие в парке",
     "body": "Обновленное описание встречи в парке Горького!",
     "tags": ["Природа", "Спорт", "Музыка"],
     "place": "Парк Горького, Москва",
@@ -34,7 +34,7 @@ event_update_example = {
 # Example event response
 event_response_example = {
     "id": str(uuid4()),
-    "title": "Встреча в парке",
+    "title": "Мероприятие в парке",
     "body": "Приглашаю всех на прогулку в парке Горького! Будем гулять, общаться и веселиться.",
     "photo": "file_uuid_here",
     "photo_url": "https://example.com/photo.jpg",
@@ -60,7 +60,7 @@ participation_example = {"participation_type": "P"}  # P: PARTICIPANT
 event_with_participation_example = {
     "event": {
         "id": str(uuid4()),
-        "title": "Встреча в парке",
+        "title": "Мероприятие в парке",
         "body": "Приглашаю всех на прогулку в парке Горького! Будем гулять, общаться и веселиться.",
         "photo": "file_uuid_here",
         "photo_url": "https://example.com/photo.jpg",
@@ -88,7 +88,7 @@ event_list_response_example = {
         {
             "event": {
                 "id": str(uuid4()),
-                "title": "Встреча в парке",
+                "title": "Мероприятие в парке",
                 "body": "Приглашаю всех на прогулку в парке Горького!",
                 "photo": "file_uuid_here",
                 "photo_url": "https://example.com/photo.jpg",

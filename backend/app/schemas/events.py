@@ -9,21 +9,10 @@ from app.core.config import ALL_TAGS
 class BaseModelNoNulls(BaseModel):
     """Base model that removes None values from responses."""
 
-    @staticmethod
-    def _remove_none_recursive(obj):
-        if isinstance(obj, dict):
-            return {
-                k: BaseModelNoNulls._remove_none_recursive(v)
-                for k, v in obj.items()
-                if v is not None
-            }
-        elif isinstance(obj, list):
-            return [BaseModelNoNulls._remove_none_recursive(i) for i in obj if i is not None]
-        return obj
+    model_config = ConfigDict(from_attributes=True, exclude_none=True)
 
-    def model_dump(self, **kwargs):
-        data = super().model_dump(**kwargs)
-        return self._remove_none_recursive(data)
+    # Remove custom model_dump to avoid OpenAPI schema generation issues
+    # Using exclude_none=True in model_config instead
 
 
 class EventBase(BaseModelNoNulls):
@@ -35,11 +24,10 @@ class EventBase(BaseModelNoNulls):
     place: Optional[str] = None
     start_date: date
     end_date: date
-    price: Optional[int] = Field(None, ge=0)
-    visability: str = Field("G", pattern="^[GP]$")  # G: GLOBAL, P: PRIVATE
-    repeatability: str = Field("N", pattern="^[NR]$")  # N: NONE, R: REPEATABLE
+    max_participants: Optional[int] = Field(None, ge=1)
+    registration_start_date: Optional[datetime] = None
+    registration_end_date: Optional[datetime] = None
     status: str = Field("A", pattern="^[AE]$")  # A: ACTIVE, E: ENDED
-    telegram_chat_link: Optional[str] = None
 
     @field_validator("tags")
     @classmethod
@@ -61,11 +49,10 @@ class EventUpdate(BaseModel):
     place: Optional[str] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
-    price: Optional[int] = Field(None, ge=0)
-    visability: Optional[str] = Field(None, pattern="^[GP]$")
-    repeatability: Optional[str] = Field(None, pattern="^[NR]$")
+    max_participants: Optional[int] = Field(None, ge=1)
+    registration_start_date: Optional[datetime] = None
+    registration_end_date: Optional[datetime] = None
     status: Optional[str] = Field(None, pattern="^[AE]$")
-    telegram_chat_link: Optional[str] = None
 
     @field_validator("tags")
     @classmethod
@@ -88,7 +75,8 @@ class EventCreate(EventUpdate):
 
 
 class EventParticipationBase(BaseModel):
-    participation_type: str = Field(..., pattern="^[CPV]$")  # C: CREATOR, P: PARTICIPANT, V: VIEWER
+    # C: CREATOR, P: PARTICIPANT, V: VIEWER, A: ADMIN/SUPERUSER
+    participation_type: str = Field(..., pattern="^[CPVA]$")
 
 
 class EventParticipationCreate(EventParticipationBase):
@@ -108,6 +96,7 @@ class Event(EventBase):
     id: str
     creator: str
     participants: int = Field(0, ge=0)  # Computed field for total participants
+    is_registration_available: bool = False  # Computed field for registration availability
     created_at: datetime
     updated_at: Optional[datetime] = None
 
@@ -119,6 +108,7 @@ class EventWithParticipation(BaseModel):
     friends_going: int = 0
     friends_of_friends_going: int = 0
     participation_type: str = "V"  # Default to VIEWER
+    participate_id: Optional[str] = None  # ID of participation record if user is participating
 
     model_config = ConfigDict(from_attributes=True)
 

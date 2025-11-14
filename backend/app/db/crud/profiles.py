@@ -17,7 +17,7 @@ from app.schemas.profiles import ProfileCreate, ProfilePatch
 
 
 def create_profile(
-    db: Session, obj_in: ProfileCreate, telegram: str, invited_by: Optional[str]
+    db: Session, obj_in: ProfileCreate, max_id: str, invited_by: Optional[str]
 ) -> Profile:
     """
     Create a new profile in the database.
@@ -38,7 +38,7 @@ def create_profile(
         avatar=obj_in.avatar,
         university=obj_in.university,
         bio=obj_in.bio,
-        telegram=telegram,
+        max_id=max_id,
         invited_by=invited_by,
     )
     db.add(db_obj)
@@ -50,13 +50,13 @@ def create_profile(
 # --------------------------------------------------------------------------------
 
 
-def get_profile_by_telegram(db: Session, telegram_id: int) -> Optional[Profile]:
+def get_profile_by_max_id(db: Session, max_id: int) -> Optional[Profile]:
     """
-    Get a profile by Telegram ID.
+    Get a profile by Max ID.
 
     Args:
         db (Session): Database session.
-        telegram_id (int): Telegram ID.
+        max_id (int): Max ID.
 
     Returns:
         Optional[Profile]: Profile instance or None if not found.
@@ -64,7 +64,7 @@ def get_profile_by_telegram(db: Session, telegram_id: int) -> Optional[Profile]:
     return (
         db.query(Profile)
         .options(joinedload(Profile.avatar_file))
-        .filter(Profile.telegram == telegram_id)
+        .filter(Profile.max_id == max_id)
         .first()
     )
 
@@ -215,7 +215,7 @@ def delete_all_profiles(db: Session) -> None:
 profile = {
     "create": create_profile,
     "get": get_profile,
-    "get_by_telegram": get_profile_by_telegram,
+    "get_by_max_id": get_profile_by_max_id,
     "get_multi": get_profiles,
     "get_by_inviter": get_profiles_by_inviter,
     "update": update_profile,

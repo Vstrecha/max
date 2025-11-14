@@ -6,7 +6,7 @@ SQLAlchemy model for profile entity and table definition.
 # --------------------------------------------------------------------------------
 
 
-from sqlalchemy import BigInteger, Column, Date, DateTime, ForeignKey, String
+from sqlalchemy import BigInteger, Boolean, Column, Date, DateTime, ForeignKey, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -28,7 +28,7 @@ class Profile(Base):
         avatar (str): ID of user's avatar file.
         university (str): User's university.
         bio (str): User's biography.
-        telegram (int): User's Telegram ID.
+        max_id (int): User's Max ID.
         invited_by (str): ID of the profile who invited this user.
         created_at (datetime): Record creation timestamp.
     """
@@ -43,8 +43,9 @@ class Profile(Base):
     avatar = Column(String, ForeignKey("files.id"), nullable=True)
     university = Column(String, nullable=True)
     bio = Column(String, nullable=True)
-    telegram = Column(BigInteger, nullable=False, index=True)
+    max_id = Column(BigInteger, nullable=False, index=True)
     invited_by = Column(String, ForeignKey("profiles.id"), nullable=True)
+    is_superuser = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
     # Relationship to self for invited_by

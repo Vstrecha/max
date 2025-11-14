@@ -1,0 +1,98 @@
+import { haptic } from '@/controllers/max'
+import { useAppStore } from '@/stores/appStore'
+import { ParticipationType, type VExtendedEvent } from '@/types/Event'
+import { getRegistrationState } from '@/utils/eventRegistration'
+import { computed, type Ref } from 'vue'
+
+export function useEventActions(event: Ref<VExtendedEvent>) {
+  const app_state = useAppStore()
+
+  const registrationState = computed(() => getRegistrationState(event.value.event))
+  const registrationBlockReason = computed(() => registrationState.value.reason)
+
+  const get_participants = computed((): string => {
+    const people_count = event.value.event.participants
+    let people_count_string = ''
+    if (people_count % 10 === 1 && people_count % 100 !== 11) {
+      people_count_string = 'заинтересованный'
+    } else {
+      people_count_string = 'заинтересованных'
+    }
+
+    const friends_count = event.value.friends_going
+    let friends_count_string = ''
+    if (friends_count % 10 === 1 && friends_count % 100 !== 11) {
+      friends_count_string = 'друг'
+    } else if (
+      friends_count % 10 >= 2 &&
+      friends_count % 10 <= 4 &&
+      (friends_count % 100 < 10 || friends_count % 100 >= 20)
+    ) {
+      friends_count_string = 'друга'
+    } else {
+      friends_count_string = 'друзей'
+    }
+
+    const base =
+      `${people_count} ${people_count_string}` +
+      (friends_count != 0 ? ` (${friends_count} ${friends_count_string})` : '')
+
+    if (event.value.event.max_participants) {
+      return `${base} из ${event.value.event.max_participants}`
+    }
+
+    return base
+  })
+
+  const is_creator = computed(() => event.value.participation_type == ParticipationType.CREATOR)
+  const is_viewer = computed(() => event.value.participation_type == ParticipationType.VIEWER)
+  const can_register = computed(() => registrationState.value.isAvailable)
+
+  const get_formatted_date = computed((): string => {
+    const startDate = new Date(event.value.event.start_date)
+    const endDate = new Date(event.value.event.end_date)
+
+    const startDay = startDate.getDate()
+    const endDay = endDate.getDate()
+    const startMonth = startDate.toLocaleString('ru-RU', { month: 'short' })
+    const endMonth = endDate.toLocaleString('ru-RU', { month: 'short' })
+    const startYear = startDate.getFullYear()
+    const endYear = endDate.getFullYear()
+
+    if (startDay === endDay && startMonth === endMonth && startYear === endYear) {
+      return `${startDay} ${startMonth} ${startYear}`
+    }
+
+    if (startMonth === endMonth && startYear === endYear) {
+      return `${startDay}-${endDay} ${startMonth} ${startYear}`
+    }
+
+    return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${endYear}`
+  })
+
+  const get_tags = computed((): string => event.value.event.tags.join(', '))
+
+  const open_extended_card = function () {
+    haptic.button_click()
+    app_state.openExtendedEventCard(event.value, true)
+  }
+
+  const open_qr = function () {
+    haptic.button_click()
+    const qr_text = event.value.participate_id
+    const qr_description = `Покажи этот QR на «${event.value.event.title}»`
+    app_state.openQRCode(qr_text, qr_description)
+  }
+
+  return {
+    get_participants,
+    get_formatted_date,
+    get_tags,
+    is_creator,
+    is_viewer,
+    can_register,
+    registrationBlockReason,
+    open_extended_card,
+    open_qr,
+  }
+}
