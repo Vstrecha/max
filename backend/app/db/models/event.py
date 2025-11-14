@@ -79,7 +79,7 @@ class Event(Base):
     @property
     def participants_count(self) -> int:
         """Get the count of participants from participations table."""
-        return len([p for p in self.participations if p.participation_type in ["C", "P", "a"]])
+        return len([p for p in self.participations if p.participation_type in ["C", "P"]])
 
     @property
     def participants(self) -> int:

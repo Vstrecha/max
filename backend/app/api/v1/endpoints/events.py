@@ -255,10 +255,8 @@ def participate_in_event(
             detail="Registration is not available for this event",
         )
 
-    # Add user participation (check if user is superuser)
-    crud_events.event.participate_in_event(
-        db, event_id=event_id, user_id=user.id, is_superuser=user.is_superuser
-    )
+    # Add user participation
+    crud_events.event.participate_in_event(db, event_id=event_id, user_id=user.id)
 
     # Return event with is_registration_available
     return _serialize_event(event)
