@@ -26,8 +26,9 @@ export const useAppStore = defineStore('App', {
     },
     endRegistrationMode() {
       this.isFullscreen = false
-      this.show_app = true
-      router.push({ name: 'home' })
+      router.push({ name: 'home' }).then(() => {
+        this.show_app = true
+      })
     },
 
     openExtendedEventCard(event: VExtendedEvent, save_position = true) {
