@@ -6,7 +6,7 @@ interface Window {
     platform: string
     ready: () => void
     shareMaxContent: (text: string, link: string) => void
-
+    openCodeReader: (fileSelect: boolean) => string  
     BackButton: {
       isVisible: boolean
       show: () => void

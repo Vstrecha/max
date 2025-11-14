@@ -2,11 +2,13 @@
 import { useEventActions } from '@/composables/useEventActions'
 import { type VExtendedEvent } from '@/types/Event'
 import IconedTextField from '@/components/utility/IconedTextField.vue'
+import {scan_qr} from '@/controllers/max'
 
 import { MapPin, CalendarClock, Users, LockOpenIcon } from 'lucide-vue-next'
 import { Button, Image as VanImage, Popup } from 'vant'
-import { toRef } from 'vue'
+import { computed, toRef } from 'vue'
 import { haptic } from '@/controllers/max'
+import { useUserStore } from '@/stores/userStore'
 
 const props = defineProps<{
   extended_event: VExtendedEvent
@@ -30,6 +32,10 @@ const {
   registrationBlockReason,
   open_qr,
 } = useEventActions(toRef(props, 'extended_event'))
+
+const user = useUserStore()
+const is_admin = computed(() => user.profile?.is_superuser)
+
 
 const select_event = () => {
   haptic.button_click()
@@ -97,6 +103,9 @@ const edit_event = () => {
         <div>
           <Button v-if="is_creator" class="event_buttons_group_small" @click="edit_event" text="Изменить" />
           <Button v-else class="event_buttons_group_small" @click="deselect_event" text="Не смогу пойти" />
+        </div>
+        <div v-if="is_admin">
+          <Button class="event_buttons_group_large" @click="scan_qr" text="Сканировать QR" />
         </div>
       </div>
     </div>

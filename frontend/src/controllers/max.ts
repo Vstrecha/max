@@ -46,6 +46,10 @@ const share_url = (url: string, description: string) => {
   app.shareMaxContent(description, url)
 }
 
+const scan_qr = () : string=> {
+  return app.openCodeReader(false);
+}
+
 
 init_app()
-export { tg_state, haptic, share_url, backButton }
+export { tg_state, haptic, share_url, scan_qr, backButton }
