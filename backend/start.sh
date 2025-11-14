@@ -1,8 +1,12 @@
 #!/bin/bash
 
+# Use environment variables with defaults
+DB_HOST=${DB_HOST:-db}
+DB_PORT=${DB_PORT:-5432}
+
 # Wait for database to be ready
 echo "Waiting for database to be ready..."
-while ! nc -z db 5432; do
+while ! nc -z ${DB_HOST} ${DB_PORT}; do
   sleep 0.1
 done
 echo "Database is ready!"

@@ -1,0 +1,80 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+README.md
+LICENSE
+
+# Docker
+docker-compose.yml
+Dockerfile*
+.dockerignore
+
+# Environment
+.env
+.env.*
+*.env
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.pytest_cache
+.coverage
+htmlcov
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+.npm
+.pnpm-store
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# Test files
+*.test
+test_*
+*_test.py
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# MinIO init (not needed in image)
+minio-init/
+
+# Nginx SSL (should be mounted as volume)
+*.pem
+*.key
+*.crt
