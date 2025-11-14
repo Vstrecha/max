@@ -42,6 +42,7 @@ const is_admin = computed(() => user.profile?.is_superuser)
 
 const scan_qr = () => {
   const qr = max_scan_qr();
+  console.log(qr);
   if (qr && qr.length != 0) {
     ApiService.events.scan_qr(qr).then(
       () => notify(VNotificationType.SUCCESS, "Такой пользователь найден.")
@@ -197,7 +198,7 @@ const edit_event = () => {
 
 .extended-event-card .event_buttons_group_large {
   width: 100%;
-  margin-bottom: 10px;
+  margin: 10px 0;
 }
 
 .extended-event-card .event_buttons_group_small {
