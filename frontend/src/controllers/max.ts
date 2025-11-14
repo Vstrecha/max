@@ -46,7 +46,8 @@ const share_url = (url: string, description: string) => {
   app.shareMaxContent(description, url)
 }
 
-const scan_qr = () : Promise<string> => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const scan_qr = () : Promise<any> => {
   return app.openCodeReader(false);
 }
 

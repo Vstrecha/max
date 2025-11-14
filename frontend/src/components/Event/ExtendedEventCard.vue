@@ -44,7 +44,7 @@ const scan_qr = () => {
   const qr = max_scan_qr();
   qr.then(
     (cnx) => {
-    ApiService.events.scan_qr(cnx).then(
+    ApiService.events.scan_qr(cnx.value).then(
       () => notify(VNotificationType.SUCCESS, "Такой пользователь найден.")
     ).catch(
       () => notify(VNotificationType.ERROR, "Не смогли найти такую запись.")
