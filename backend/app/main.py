@@ -110,7 +110,7 @@ async def lifespan(app: FastAPI):
     Yields:
         None
     """
-    logger.info("Starting vstrecha application...")
+    logger.info("Starting max-events application...")
     yield
 
 
@@ -123,7 +123,7 @@ app = FastAPI(
     redoc_url="/redoc",
     lifespan=lifespan,
     description="""
-# Vstrecha API
+# Max Events API
 
 ## Request Headers
 
@@ -276,4 +276,4 @@ async def root():
     Returns:
         dict: API status message.
     """
-    return {"status": "ok", "message": "Vstrecha API is running"}
+    return {"status": "ok", "message": "Max Events API is running"}

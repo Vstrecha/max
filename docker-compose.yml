@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:17
-    container_name: max-postgres
+    container_name: max-events-postgres
     restart: unless-stopped
     env_file:
       - .env
@@ -53,7 +53,7 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: max-minio
+    container_name: max-events-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
     env_file:
@@ -74,7 +74,7 @@ services:
 
   minio-init:
     image: minio/mc:latest
-    container_name: max-minio-init
+    container_name: max-events-minio-init
     depends_on:
       minio:
         condition: service_healthy
@@ -92,7 +92,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: max-nginx
+    container_name: max-events-nginx
     ports:
       - "80:80"
       - "443:443"

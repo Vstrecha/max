@@ -103,14 +103,14 @@ const submitProfile = async () => {
       <div class="content">
         <Row justify="center">
           <div class="logo_wrap">
-            <img class="logo_icon" src="@/assets/icons/vstrecha-icon.svg" />
-            <span class="logo_header">Встреча!</span>
+            <img class="logo_icon" src="@/assets/icons/max-events-icon.svg" />
+            <span class="logo_header">Max!</span>
           </div>
         </Row>
 
         <div class="intro">
           <p class="product_description">
-            На «Встречу!» студенты находят интересные события и собираются вместе офлайн.
+            На «Max!» студенты находят интересные события и собираются вместе офлайн.
             Подключайся, чтобы не пропускать тусовки своего университета и знакомиться с новыми
             людьми.
           </p>
