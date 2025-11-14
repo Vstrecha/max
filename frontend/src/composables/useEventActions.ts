@@ -79,7 +79,7 @@ export function useEventActions(event: Ref<VExtendedEvent>) {
 
   const open_qr = function () {
     haptic.button_click()
-    const qr_text = event.value.participation_id
+    const qr_text = event.value.participate_id
     const qr_description = `Покажи этот QR на «${event.value.event.title}»`
     app_state.openQRCode(qr_text, qr_description)
   }
