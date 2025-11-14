@@ -26,8 +26,13 @@ export const useAppStore = defineStore('App', {
     },
     endRegistrationMode() {
       this.isFullscreen = false
-      router.push({ name: 'home' }).then(() => {
-        this.show_app = true
+      this.show_app = true
+      router.push({ name: 'home' }).catch((error) => {
+        console.error('Navigation error:', error)
+        // Fallback: try to navigate by path
+        router.push('/').then(() => {
+          this.show_app = true
+        })
       })
     },
 

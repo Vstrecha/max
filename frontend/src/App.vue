@@ -56,11 +56,7 @@ init()
     class="main-app-container"
     :class="{ 'main-app-container-fullscreen': app_state.isFullscreen || !app_state.showTabBar }"
   >
-    <RouterView v-slot="{ Component, route }">
-      <Transition name="zoom-fade">
-        <component :is="Component" :key="route.path" />
-      </Transition>
-    </RouterView>
+    <RouterView />
   </main>
   <TabBar v-if="!app_state.isFullscreen && app_state.showTabBar" />
 </template>
