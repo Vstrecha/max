@@ -46,7 +46,7 @@ const share_url = (url: string, description: string) => {
   app.shareMaxContent(description, url)
 }
 
-const scan_qr = () : string=> {
+const scan_qr = () : Promise<string> => {
   return app.openCodeReader(false);
 }
 

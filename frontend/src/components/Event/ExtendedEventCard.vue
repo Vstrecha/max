@@ -42,16 +42,16 @@ const is_admin = computed(() => user.profile?.is_superuser)
 
 const scan_qr = () => {
   const qr = max_scan_qr();
-  console.log(qr);
-  if (qr && qr.length != 0) {
-    ApiService.events.scan_qr(qr).then(
+  qr.then(
+    (cnx) => {
+    ApiService.events.scan_qr(cnx).then(
       () => notify(VNotificationType.SUCCESS, "Такой пользователь найден.")
     ).catch(
       () => notify(VNotificationType.ERROR, "Не смогли найти такую запись.")
     )
-  } else {
-    notify(VNotificationType.WARNING, "Qr код не был распознан.");
-  }
+  }).catch (
+    () => notify(VNotificationType.WARNING, "Qr код не был распознан.")
+  )
 }
 
 const select_event = () => {
