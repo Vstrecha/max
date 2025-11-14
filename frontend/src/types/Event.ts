@@ -86,7 +86,7 @@ const VExtendedEventSchema = v.object({
   event: VEventSchema,
   friends_going: v.number(),
   participation_type: v.enum(ParticipationType),
-  participation_id: v.pipe(
+  participate_id: v.pipe(
     v.any(),
     v.transform((value) => (value === null ? undefined : value)), // null -> undefined
     v.optional(
@@ -123,7 +123,7 @@ const VExtendedEventSkeleton = (): VExtendedEvent => ({
   },
   friends_going: 0,
   participation_type: 'V',
-  participation_id: undefined,  
+  participate_id: undefined,  
 })
 
 const VQRResultSchema = v.object({

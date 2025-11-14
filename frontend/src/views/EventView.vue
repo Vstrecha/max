@@ -143,7 +143,7 @@ const create_event = async (new_event: VEvent) => {
       event: { ...created_event },
       friends_going: 0,
       participation_type: ParticipationType.CREATOR,
-      participation_id: ""
+      participate_id: ""
     })
   } catch (error) {
     notify(VNotificationType.ERROR, `Не смогли создать событие. \n ${error}`)
