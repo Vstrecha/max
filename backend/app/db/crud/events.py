@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.db.crud.friends import get_friends_of_friends_ids
 from app.db.models.event import Event, EventParticipation
 from app.db.models.friends import Friends
+from app.db.models.profile import Profile
 from app.schemas.events import EventCreate, EventUpdate
 
 
@@ -122,8 +123,13 @@ class CRUDEvent:
     def get_user_participation_type(self, db: Session, *, event_id: str, user_id: str) -> str:
         """
         Get user's participation type for an event. Returns 'V' (VIEWER) if no
-        participation found.
+        participation found. Returns 'A' (ADMIN) if user is superuser.
         """
+        # Check if user is superuser
+        user_profile = db.query(Profile).filter(Profile.id == user_id).first()
+        if user_profile and user_profile.is_superuser:
+            return "A"
+
         participation = (
             db.query(EventParticipation)
             .filter(

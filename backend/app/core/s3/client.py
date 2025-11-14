@@ -53,6 +53,7 @@ class S3Client:
         )
         self.bucket = bucket
         self.public_url = public_url
+        self.endpoint_url = endpoint_url
 
     # --------------------------------------------------------------------------------
 
@@ -73,13 +74,22 @@ class S3Client:
         """
         unique_filename = f"avatars/{filename}"
         try:
-            self.s3.put_object(
-                Bucket=self.bucket,
-                Key=unique_filename,
-                Body=file_bytes,
-                ContentType=content_type,
-                ACL="public-read",
-            )
-            return f"{self.public_url}/{unique_filename}"
+            # MinIO may not support ACL parameter, so we omit it
+            # Bucket is already configured as public in initialization script
+            put_params = {
+                "Bucket": self.bucket,
+                "Key": unique_filename,
+                "Body": file_bytes,
+                "ContentType": content_type,
+            }
+            # Only add ACL if not using MinIO (for AWS S3 compatibility)
+            # Check if endpoint_url contains 'minio' to determine if we're using MinIO
+            if self.endpoint_url and "minio" not in self.endpoint_url.lower():
+                put_params["ACL"] = "public-read"
+
+            self.s3.put_object(**put_params)
+            # Construct public URL: public_url should be base URL (e.g., https://domain.com/s3)
+            # MinIO path format: /bucket/key
+            return f"{self.public_url}/{self.bucket}/{unique_filename}"
         except NoCredentialsError:
             raise Exception("S3 credentials not found")

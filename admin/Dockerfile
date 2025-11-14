@@ -14,11 +14,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
-# Make start script executable
-RUN chmod +x start.sh
+# Install dos2unix for line ending conversion and make start script executable
+RUN apt-get update && apt-get install -y dos2unix && \
+    dos2unix start.sh && \
+    chmod +x start.sh && \
+    rm -rf /var/lib/apt/lists/*
 
 # Expose port
 EXPOSE 8001
 
 # Run start script which handles migrations and superuser creation
-CMD ["./start.sh"]
+CMD ["/bin/bash", "/app/start.sh"]
