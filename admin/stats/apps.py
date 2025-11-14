@@ -9,6 +9,6 @@ class StatsConfig(AppConfig):
         """Configure admin site when app is ready."""
         from django.contrib import admin
 
-        admin.site.site_header = "Панель управления Встреча"
-        admin.site.site_title = "Встреча Админ"
+        admin.site.site_header = "Панель управления Max"
+        admin.site.site_title = "Max Админ"
         admin.site.index_title = "Добро пожаловать в панель управления"

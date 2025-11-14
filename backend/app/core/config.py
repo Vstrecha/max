@@ -48,7 +48,7 @@ class Settings(BaseSettings):
         API_VERSION (str): Base API path prefix.
     """
 
-    PROJECT_NAME: str = "Встреча service"
+    PROJECT_NAME: str = "Max Events service"
     VERSION: str = "1.0.0"
     API_VERSION: str = "/v1"
 

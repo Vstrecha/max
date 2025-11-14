@@ -67,7 +67,7 @@ WSGI_APPLICATION = "admin_panel.wsgi.application"
 # Database
 # Connect to the same PostgreSQL database as the backend
 # Support both POSTGRES_* and DB_* environment variables
-db_name = os.getenv("POSTGRES_DB") or os.getenv("DB_NAME", "vstrecha")
+db_name = os.getenv("POSTGRES_DB") or os.getenv("DB_NAME", "max-events")
 db_user = os.getenv("POSTGRES_USER") or os.getenv("DB_USER", "postgres")
 db_password = os.getenv("POSTGRES_PASSWORD") or os.getenv("DB_PASSWORD", "postgres")
 db_host = os.getenv("POSTGRES_HOST") or os.getenv("DB_HOST", "db")

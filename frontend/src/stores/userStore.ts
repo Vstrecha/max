@@ -13,8 +13,8 @@ export const useUserStore = defineStore('User', {
   actions: {
     async create_invitation() {
       const invitation = await ApiService.friends.create_invitation()
-      const tg_url = `https://t.me/stud_vstrecha_bot?startapp=${invitation}`
-      share_url(tg_url, 'Приглашаю в друзья в приложении Встреча!')
+      const tg_url = `https://t.me/stud_max-events_bot?startapp=${invitation}`
+      share_url(tg_url, 'Приглашаю в друзья в приложении Max!')
     },
   },
 })

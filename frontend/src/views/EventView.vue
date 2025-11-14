@@ -137,7 +137,7 @@ const validate_event = (new_event: VEvent) => {
 const create_event = async (new_event: VEvent) => {
   try {
     const created_event = await ApiService.events.create_event(new_event)
-    notify(VNotificationType.SUCCESS, 'Встреча создана!')
+    notify(VNotificationType.SUCCESS, 'Событие создано!')
     // :TODO: Is it the best idea?
     app_state.openExtendedEventCard({
       event: { ...created_event },
