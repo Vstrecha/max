@@ -4,12 +4,10 @@ import { useUserEventsStore } from '@/stores/userEventsStore'
 import { Row, Button } from 'vant'
 import { useRoute, useRouter } from 'vue-router'
 import { haptic } from '@/controllers/max'
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
-import { useAppStore } from '@/stores/appStore'
 
 const user_events = useUserEventsStore()
-const app_state = useAppStore()
 const user_state = useUserStore()
 const route = useRoute()
 const router = useRouter()
@@ -18,7 +16,7 @@ const is_none_events = computed(() => user_events.is_events_over && user_events.
 
 // Загружаем события при первом рендере, если они еще не загружены
 const loadEventsIfNeeded = () => {
-  if (app_state.show_app && user_events.events.length === 0 && !user_events.is_events_over) {
+  if (user_events.events.length === 0 && !user_events.is_events_over) {
     user_events.reload_events()
   }
 }
@@ -27,12 +25,6 @@ onMounted(() => {
   loadEventsIfNeeded()
 })
 
-// Загружаем события когда show_app становится true (после регистрации)
-watch(() => app_state.show_app, (newValue) => {
-  if (newValue) {
-    loadEventsIfNeeded()
-  }
-})
 const is_moderator = computed(() => user_state.profile?.is_superuser === true)
 // :TODO: ugly solution
 const has_path_children = computed(() => route.name === 'friend_request')
@@ -56,7 +48,7 @@ const open_create_event = () => {
         <h2 class="title">Мои Встречи:</h2>
       </div>
       <EventsList
-        v-if="!is_none_events && app_state.show_app"
+        v-if="!is_none_events"
         :events_list="user_events.events"
         :load_more_events="user_events.load_more_events"
         :reload_events="user_events.reload_events"
