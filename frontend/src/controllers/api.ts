@@ -1,8 +1,10 @@
 import {
   VEventSchema,
   VExtendedEventsRespondSchema,
+  VQRResultSchema,
   type VEvent,
   type VExtendedEventsRespond,
+  type VQRResult,
 } from '@/types/Event'
 import { tg_state } from './max'
 import {
@@ -68,6 +70,12 @@ apiClient.interceptors.response.use(
 )
 
 const EventsApi = {
+  async scan_qr(qr_content: string): Promise<VQRResult> {
+    const url = `events/scan_qr`
+    const data = {participation_id: qr_content}
+    const response = await apiClient.post(url, data)
+    return parse_response(VQRResultSchema, response.data)
+  },
   async select_event(event_id: string): Promise<VEvent> {
     const url = `events/user_events/${event_id}`
     const response = await apiClient.post(url)

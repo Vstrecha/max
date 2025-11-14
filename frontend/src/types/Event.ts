@@ -119,6 +119,13 @@ const VExtendedEventSkeleton = (): VExtendedEvent => ({
   participation_type: 'V',
 })
 
+const VQRResultSchema = v.object({
+  user_id: v.string(),
+  event_id: v.string(),
+})
+
+type VQRResult = v.InferInput<typeof VQRResultSchema>
+
 export {
   EventStatus,
   VEventSchema,
@@ -126,6 +133,7 @@ export {
   ParticipationType,
   VExtendedEventSkeleton,
   VExtendedEventsRespondSchema,
+  VQRResultSchema,
 }
 export type {
   EventStatusType,
@@ -133,4 +141,5 @@ export type {
   VExtendedEvent,
   EventsFilter,
   VExtendedEventsRespond,
+  VQRResult,
 }

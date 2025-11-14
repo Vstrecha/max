@@ -2,13 +2,16 @@
 import { useEventActions } from '@/composables/useEventActions'
 import { type VExtendedEvent } from '@/types/Event'
 import IconedTextField from '@/components/utility/IconedTextField.vue'
-import {scan_qr} from '@/controllers/max'
+import {scan_qr as max_scan_qr} from '@/controllers/max'
 
 import { MapPin, CalendarClock, Users, LockOpenIcon } from 'lucide-vue-next'
 import { Button, Image as VanImage, Popup } from 'vant'
 import { computed, toRef } from 'vue'
 import { haptic } from '@/controllers/max'
 import { useUserStore } from '@/stores/userStore'
+import { ApiService } from '@/controllers/api'
+import { notify } from '@/controllers/notifications'
+import { VNotificationType } from '@/types/Notification'
 
 const props = defineProps<{
   extended_event: VExtendedEvent
@@ -36,6 +39,19 @@ const {
 const user = useUserStore()
 const is_admin = computed(() => user.profile?.is_superuser)
 
+
+const scan_qr = () => {
+  const qr = max_scan_qr();
+  if (qr && qr.length != 0) {
+    ApiService.events.scan_qr(qr).then(
+      () => notify(VNotificationType.SUCCESS, "Такой пользователь найден.")
+    ).catch(
+      () => notify(VNotificationType.ERROR, "Не смогли найти такую запись.")
+    )
+  } else {
+    notify(VNotificationType.WARNING, "Qr код не был распознан.");
+  }
+}
 
 const select_event = () => {
   haptic.button_click()
