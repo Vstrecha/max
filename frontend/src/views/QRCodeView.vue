@@ -23,7 +23,7 @@ const goBack = () => {
       <div class="content">
         <Row justify="center">
           <div class="logo_wrap">
-            <img class="logo_icon" src="@/assets/icons/max-events-icon.svg" alt="Max!" />
+            <img class="logo_icon" src="@/assets/icons/vstrecha-icon.svg" alt="Max!" />
             <span class="logo_header">Max!</span>
           </div>
         </Row>
