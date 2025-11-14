@@ -119,19 +119,38 @@ class CRUDEvent:
         event = db.query(Event).filter(Event.id == event_id).first()
         return event and event.creator == user_id
 
-    def get_user_participation_type(self, db: Session, *, event_id: str, user_id: str) -> str:
+    def get_user_participation(
+        self, db: Session, *, event_id: str, user_id: str
+    ) -> Optional[EventParticipation]:
         """
-        Get user's participation type for an event. Returns 'V' (VIEWER) if no
+        Get user's participation record for an event. Returns None if no
         participation found.
         """
-        participation = (
+        return (
             db.query(EventParticipation)
             .filter(
                 and_(EventParticipation.event_id == event_id, EventParticipation.user_id == user_id)
             )
             .first()
         )
+
+    def get_user_participation_type(self, db: Session, *, event_id: str, user_id: str) -> str:
+        """
+        Get user's participation type for an event. Returns 'V' (VIEWER) if no
+        participation found.
+        """
+        participation = self.get_user_participation(db, event_id=event_id, user_id=user_id)
         return participation.participation_type if participation else "V"
+
+    def get_user_participation_id(
+        self, db: Session, *, event_id: str, user_id: str
+    ) -> Optional[str]:
+        """
+        Get user's participation ID for an event. Returns None if no
+        participation found.
+        """
+        participation = self.get_user_participation(db, event_id=event_id, user_id=user_id)
+        return participation.id if participation else None
 
     def get_friends_going_count(self, db: Session, *, event_id: str, user_id: str) -> int:
         """Get count of friends going to the event."""
