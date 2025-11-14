@@ -4,7 +4,7 @@ import { useUserEventsStore } from '@/stores/userEventsStore'
 import { Row, Button } from 'vant'
 import { useRoute, useRouter } from 'vue-router'
 import { haptic } from '@/controllers/max'
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { useAppStore } from '@/stores/appStore'
 
@@ -15,10 +15,24 @@ const route = useRoute()
 const router = useRouter()
 
 const is_none_events = computed(() => user_events.is_events_over && user_events.events.length == 0)
-// :TODO: rethink. How to check
-if (is_none_events.value) {
-  user_events.reload_events()
+
+// Загружаем события при первом рендере, если они еще не загружены
+const loadEventsIfNeeded = () => {
+  if (app_state.show_app && user_events.events.length === 0 && !user_events.is_events_over) {
+    user_events.reload_events()
+  }
 }
+
+onMounted(() => {
+  loadEventsIfNeeded()
+})
+
+// Загружаем события когда show_app становится true (после регистрации)
+watch(() => app_state.show_app, (newValue) => {
+  if (newValue) {
+    loadEventsIfNeeded()
+  }
+})
 const is_moderator = computed(() => user_state.profile?.is_superuser === true)
 // :TODO: ugly solution
 const has_path_children = computed(() => route.name === 'friend_request')

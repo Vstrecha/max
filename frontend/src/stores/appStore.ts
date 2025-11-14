@@ -26,6 +26,7 @@ export const useAppStore = defineStore('App', {
     },
     endRegistrationMode() {
       this.isFullscreen = false
+      this.show_app = true
       router.push({ name: 'home' })
     },
 
